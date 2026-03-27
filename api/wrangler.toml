@@ -1,0 +1,95 @@
+# api/wrangler.toml
+name = "maintenance-scheduler-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ============================================================================
+# CLOUDFLARE PAGES (frontend binding)
+# ============================================================================
+
+[env.production]
+routes = [
+  { pattern = "yourdomain.com/api/*", zone_name = "yourdomain.com" }
+]
+
+[env.preview]
+routes = [
+  { pattern = "preview.yourdomain.com/api/*", zone_name = "yourdomain.com" }
+]
+
+# ============================================================================
+# D1 DATABASE BINDING
+# ============================================================================
+
+[[d1_databases]]
+binding = "DB"
+database_name = "maintenance-scheduler"
+database_id = "" # Set this after creating DB
+
+# ============================================================================
+# R2 BUCKET (for file uploads - Phase 2)
+# ============================================================================
+
+[[r2_buckets]]
+binding = "BUCKET_R2"
+bucket_name = "maintenance-scheduler-files"
+preview_bucket_name = "maintenance-scheduler-files-preview"
+
+# ============================================================================
+# ENVIRONMENT VARIABLES
+# ============================================================================
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.preview]
+vars = { ENVIRONMENT = "preview" }
+
+[env.development]
+vars = { ENVIRONMENT = "development" }
+
+# ============================================================================
+# SECRETS (set via `wrangler secret put` command)
+# ============================================================================
+# JWT_SECRET
+# SMTP2GO_API_KEY
+# SMTP_FROM_EMAIL
+
+# ============================================================================
+# CRON TRIGGERS (scheduled jobs)
+# ============================================================================
+
+[[triggers.crons]]
+cron = "0 9 * * *"  # Daily at 9 UTC (adjust based on your needs)
+
+# Alternative cron patterns:
+# "*/5 * * * *"    = Every 5 minutes
+# "0 * * * *"      = Every hour
+# "0 9,17 * * *"   = At 9 AM and 5 PM
+
+# ============================================================================
+# BUILD CONFIGURATION
+# ============================================================================
+
+[build]
+command = "npm run build:api"
+cwd = "."
+watch_paths = ["api/src/**/*.ts"]
+
+[build.upload]
+format = "modules"
+main = "./api/dist/index.js"
+
+# ============================================================================
+# OBSERVABILITY
+# ============================================================================
+
+[observability]
+enabled = true
+
+# ============================================================================
+# LIMITS & CONFIGURATION
+# ============================================================================
+
+limits = { cpu_milliseconds = 50000 }
