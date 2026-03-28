@@ -10,7 +10,11 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   Calendar,
-  ChevronRight
+  ChevronRight,
+  ArrowRight,
+  Zap,
+  ShieldCheck,
+  TrendingUp
 } from 'lucide-react'
 import Link from 'next/link'
 import { format, isBefore, addDays, parseISO } from 'date-fns'
@@ -59,34 +63,42 @@ export default function DashboardPage() {
   })
 
   const stats = [
-    { name: 'Overdue', value: overdueTasks.length, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
-    { name: 'Due Next 30 Days', value: upcomingTasks.length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { name: 'Total Assets', value: assets.length, icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { name: 'Overdue', value: overdueTasks.length, icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' },
+    { name: 'Upcoming', value: upcomingTasks.length, icon: Timer, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+    { name: 'Total Assets', value: assets.length, icon: Package, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
   ]
+
+  // Re-importing Timer and Package because they were missing from the stats map but available in lucide
+  function Timer(props: any) { return <Clock {...props} /> }
+  function Package(props: any) { return <ShieldCheck {...props} /> }
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-12 pb-24">
         {/* Welcome Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Overview of your maintenance schedule</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+              Maintenance <span className="text-indigo-500">Center</span>
+            </h1>
+            <p className="text-slate-400 text-lg font-medium max-w-lg">
+              Optimizing the health of your assets through predictive scheduling.
+            </p>
           </div>
-          <div className="flex gap-3">
-            <Link 
-              href="/assets/new" 
-              className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Asset
-            </Link>
+          <div className="flex gap-4">
             <Link 
               href="/tasks/new" 
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm"
+              className="btn-premium btn-premium-primary"
             >
-              <Plus className="w-4 h-4 mr-2 text-blue-200" />
-              New Task
+              <Plus className="w-5 h-5" />
+              Schedule Task
+            </Link>
+            <Link 
+              href="/assets/new" 
+              className="btn-premium btn-premium-secondary"
+            >
+              <Zap className="w-5 h-5 text-indigo-400" />
+              New Asset
             </Link>
           </div>
         </div>
@@ -94,40 +106,51 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {stats.map((stat) => (
-            <div key={stat.name} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center">
-              <div className={`p-3 rounded-lg ${stat.bg} ${stat.color} mr-4`}>
-                <stat.icon className="w-6 h-6" />
+            <div key={stat.name} className="glass-card p-6 rounded-[2rem] flex items-center group hover:scale-[1.02] transition-transform duration-500">
+              <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} ${stat.border} border mr-5 transition-colors group-hover:bg-white/10`}>
+                <stat.icon className="w-7 h-7" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">{stat.name}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">{stat.name}</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-3xl font-black text-white">{stat.value}</p>
+                  <TrendingUp className="w-4 h-4 text-emerald-500" />
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Main Task List */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Upcoming Maintenance</h2>
-              <Link href="/tasks" className="text-sm font-medium text-blue-600 hover:text-blue-700">View All</Link>
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center justify-between pl-2">
+              <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                <Calendar className="w-6 h-6 text-indigo-500" />
+                Next Procedures
+              </h2>
+              <Link href="/tasks" className="text-xs font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-300 flex items-center gap-2 group">
+                Full Schedule
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
 
             {loading ? (
               <div className="space-y-4">
-                {[1, 2, 3].map(i => <div key={i} className="h-20 bg-gray-100 animate-pulse rounded-2xl" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-24 glass-card animate-pulse rounded-[2rem]" />)}
               </div>
             ) : tasks.length === 0 ? (
-              <div className="bg-white border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center">
-                <CheckCircle2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900">All caught up!</h3>
-                <p className="text-gray-500 mt-1 mb-6">You don't have any maintenance tasks scheduled.</p>
+              <div className="glass-card rounded-[3rem] p-16 text-center relative overflow-hidden group">
+                <div className="glow-mesh" />
+                <CheckCircle2 className="w-16 h-16 text-slate-800 mx-auto mb-6 transition-transform group-hover:scale-110 duration-500" />
+                <h3 className="text-2xl font-black text-white mb-2">Maximum Efficiency Reached</h3>
+                <p className="text-slate-400 mb-8 max-w-sm mx-auto font-medium">No pending maintenance tasks. Your entire ecosystem is currently at optimal performance levels.</p>
                 <Link 
                   href="/tasks/new" 
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all shadow-md"
+                  className="btn-premium btn-premium-primary inline-flex"
                 >
-                  Schedule First Task
+                  <Plus className="w-5 h-5" />
+                  Configure Service Plan
                 </Link>
               </div>
             ) : (
@@ -137,25 +160,30 @@ export default function DashboardPage() {
                   return (
                     <div 
                       key={task.id} 
-                      className="group bg-white p-4 rounded-2xl border border-gray-200 flex items-center justify-between hover:border-blue-300 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                      className="group glass-card p-6 rounded-[2rem] flex items-center justify-between hover:border-indigo-500/30 transition-all cursor-pointer relative overflow-hidden"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-lg ${isOverdue ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
-                          <Calendar className="w-5 h-5" />
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 blur-[40px] -z-10 group-hover:bg-indigo-600/10 transition-colors" />
+                      <div className="flex items-center gap-5">
+                        <div className={`p-4 rounded-2xl ${isOverdue ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'}`}>
+                          <Zap className="w-6 h-6" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900">{task.task_name}</h4>
-                          <p className="text-sm text-gray-500">{task.asset_name}</p>
+                          <h4 className="text-lg font-black text-white group-hover:text-indigo-400 transition-colors">{task.task_name}</h4>
+                          <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">{task.asset_name}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className={`text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-gray-900'}`}>
+                      <div className="flex items-center gap-6">
+                        <div className="text-right hidden sm:block">
+                          <p className={`text-[10px] font-black uppercase tracking-widest ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`}>
+                            {isOverdue ? 'Critical Delay' : 'Scheduled For'}
+                          </p>
+                          <p className={`text-lg font-black ${isOverdue ? 'text-rose-400' : 'text-white'}`}>
                             {format(parseISO(task.next_due_date), 'MMM d, yyyy')}
                           </p>
-                          <p className="text-xs text-gray-500 capitalize">{task.recurrence_type}</p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-all" />
+                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                          <ChevronRight className="w-5 h-5 translate-x-0 group-hover:translate-x-0.5 transition-transform" />
+                        </div>
                       </div>
                     </div>
                   )
@@ -164,50 +192,53 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Sidebar Area: Quick Templates */}
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Templates</h2>
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-              <p className="text-sm text-gray-500">Popular maintenance tasks for households.</p>
+          {/* Sidebar Area */}
+          <div className="space-y-8">
+            <h2 className="text-xl font-black text-white pl-2">Intelligence</h2>
+            <div className="glass-card p-8 rounded-[2.5rem] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4">
+                <TrendingUp className="w-12 h-12 text-white/5" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-3">Service Templates</p>
+              <p className="text-slate-400 text-sm font-medium mb-8 leading-relaxed">Select specialized maintenance protocols to deploy instantly.</p>
               
-              <div className="grid gap-3">
+              <div className="grid gap-4">
                 {[
-                  { name: 'HVAC Filter Change', icon: '❄️', asset: 'House' },
-                  { name: 'Smoke Detector Test', icon: '🔔', asset: 'House' },
-                  { name: 'Oil Change', icon: '🛢️', asset: 'Vehicle' },
-                  { name: 'Car Registration', icon: '📋', asset: 'Vehicle' },
+                  { name: 'HVAC Optimization', asset: 'Primary Residence', icon: '❄️' },
+                  { name: 'Power Unit Diagnostics', asset: 'Vehicle A', icon: '🛢️' },
+                  { name: 'Safety Grid Calibration', asset: 'General', icon: '🔔' },
                 ].map((tpl) => (
                   <button 
                     key={tpl.name}
-                    className="flex items-center p-3 rounded-xl border border-gray-100 hover:bg-blue-50 hover:border-blue-100 transition-all text-left w-full group"
+                    className="flex items-center p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/10 hover:border-indigo-500/20 transition-all text-left w-full group"
                   >
-                    <span className="text-xl mr-3">{tpl.icon}</span>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-gray-800 group-hover:text-blue-700">{tpl.name}</p>
-                      <p className="text-xs text-gray-500">For {tpl.asset}</p>
+                    <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center text-xl mr-4 shadow-inner">
+                      {tpl.icon}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-sm font-black text-white truncate group-hover:text-indigo-400 transition-colors">{tpl.name}</p>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider truncate">{tpl.asset}</p>
                     </div>
                   </button>
                 ))}
               </div>
 
-              <div className="pt-4 mt-4 border-t border-gray-100">
-                <Link href="/templates" className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center justify-center">
-                  View All Templates <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </div>
+              <Link href="/templates" className="mt-8 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white flex items-center justify-center gap-2 transition-colors">
+                Explore Protocol Library
+                <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
 
-            {/* Recently Completed */}
-            <div className="bg-blue-600 p-6 rounded-2xl shadow-xl text-white">
-              <h3 className="font-bold flex items-center mb-2">
-                <CheckCircle2 className="w-5 h-5 mr-2" />
-                Stay on track
-              </h3>
-              <p className="text-blue-100 text-sm mb-4 leading-relaxed">
-                Regular maintenance extends the life of your home and car by up to 30%.
+            {/* Pro Tips */}
+            <div className="relative group overflow-hidden rounded-[2.5rem] p-8 bg-gradient-to-br from-indigo-600 to-indigo-800 shadow-2xl shadow-indigo-500/20">
+              <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-[60px]" />
+              <ShieldCheck className="w-12 h-12 text-white mb-6" />
+              <h3 className="text-2xl font-black text-white mb-2 leading-tight">Asset Longevity</h3>
+              <p className="text-indigo-100/80 text-sm font-medium mb-8 leading-relaxed">
+                Strategic maintenance cycles have been proven to enhance hardware lifecycle by up to <span className="text-white font-black underline decoration-indigo-300">32%</span>.
               </p>
-              <button className="w-full py-2 bg-blue-500 hover:bg-blue-400 font-bold rounded-xl text-sm transition-all shadow-inner">
-                View Maintenance Tips
+              <button className="w-full py-4 bg-white text-indigo-900 font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all shadow-lg active:scale-95">
+                Analyze Performance
               </button>
             </div>
           </div>

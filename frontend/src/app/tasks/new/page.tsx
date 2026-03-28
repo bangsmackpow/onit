@@ -9,7 +9,15 @@ import {
   ArrowLeft, 
   Calendar, 
   FileText,
-  AlertCircle
+  AlertCircle,
+  ArrowRight,
+  Zap,
+  Clock,
+  Layout,
+  Database,
+  Timer,
+  X,
+  Bell
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -61,7 +69,7 @@ function NewTaskForm() {
       await apiPost('/api/tasks', {
         ...formData,
         assignmentType: 'single',
-        assignedToUserIds: [], // handled by api side check
+        assignedToUserIds: [], // handled by api side
       })
       router.push('/tasks')
     } catch (err: any) {
@@ -73,143 +81,189 @@ function NewTaskForm() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-12 pb-24">
       <Link 
         href="/tasks" 
-        className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 mb-4 transition-colors group"
+        className="inline-flex items-center text-xs font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 mb-4 transition-colors group"
       >
-        <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-        Back to Tasks
+        <ArrowLeft className="w-4 h-4 mr-3 group-hover:-translate-x-1 transition-transform" />
+        Discard Pipeline Addition
       </Link>
 
-      <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Schedule Task</h1>
-        <p className="text-gray-600">Add a new recurring maintenance task to an asset</p>
+      <div className="space-y-4">
+        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+          Schedule <span className="text-indigo-500">Protocol</span>
+        </h1>
+        <p className="text-slate-400 text-lg font-medium max-w-lg">
+          Initialize a new maintenance routine for specific hardware objects.
+        </p>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-4 text-red-700 animate-in fade-in slide-in-from-top-2">
+        <div className="p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex items-start gap-5 text-rose-400 animate-in slide-in-from-top-4 duration-500">
           <AlertCircle className="w-6 h-6 flex-shrink-0" />
-          <p className="font-medium">{error}</p>
+          <p className="font-bold text-sm">{error}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden p-8 md:p-10 space-y-8">
-        <div className="space-y-6">
-          {/* Asset Selection */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Target Asset</label>
-            <select 
-              value={formData.assetId}
-              onChange={(e) => setFormData({...formData, assetId: e.target.value})}
-              required
-              className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all font-medium text-gray-900 shadow-inner"
-            >
-              <option value="" disabled>Select an asset...</option>
-              {assets.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-            </select>
+      <form onSubmit={handleSubmit} className="glass-card rounded-[3.5rem] overflow-hidden p-10 md:p-16 space-y-12 relative">
+        <div className="glow-mesh" />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
+          {/* Target Asset Selection */}
+          <div className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+              <Layout className="w-3 h-3" />
+              Target Target Unit
+            </label>
+            <div className="relative group">
+              <select 
+                value={formData.assetId}
+                onChange={(e) => setFormData({...formData, assetId: e.target.value})}
+                required
+                className="input-premium py-5 px-8"
+              >
+                <option value="" disabled className="bg-slate-900">Select an infrastructure unit...</option>
+                {assets.map(a => <option key={a.id} value={a.id} className="bg-slate-900">{a.name}</option>)}
+              </select>
+              <div className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2">
+                <ArrowRight className="w-4 h-4 text-slate-500 rotate-90" />
+              </div>
+            </div>
             {assets.length === 0 && (
-              <p className="text-xs text-amber-600 font-bold mt-2">
-                No assets found. <Link href="/assets/new" className="underline">Add an asset first</Link>.
+              <p className="text-[10px] text-amber-500 font-black uppercase tracking-widest mt-2 ml-4">
+                No units detected. <Link href="/assets/new" className="text-white underline">Initialize Unit</Link>
               </p>
             )}
           </div>
 
-          {/* Task Name */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Task Name</label>
-            <div className="relative">
-              <FileText className="absolute left-5 top-4 w-5 h-5 text-gray-400" />
+          {/* Task Name Input */}
+          <div className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+              <Zap className="w-3 h-3" />
+              Operation Identifier
+            </label>
+            <div className="relative group/input">
+              <FileText className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-indigo-400 transition-colors" />
               <input 
                 type="text" 
                 required
                 value={formData.taskName}
                 onChange={(e) => setFormData({...formData, taskName: e.target.value})}
-                placeholder="e.g. Engine Oil Change"
-                className="w-full pl-14 pr-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all font-medium text-gray-900 shadow-inner"
+                placeholder="e.g. Engine Calibration"
+                className="input-premium pl-16 py-5"
               />
             </div>
           </div>
 
-          {/* Recurrence Selection */}
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Recurrence</label>
+          {/* Recurrence Pattern Selection */}
+          <div className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+              <Clock className="w-3 h-3" />
+              Frequency Pattern
+            </label>
+            <div className="relative group">
               <select 
                 value={formData.recurrenceType}
                 onChange={(e) => setFormData({...formData, recurrenceType: e.target.value as any})}
-                className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all font-medium text-gray-900 shadow-inner"
+                className="input-premium py-5 px-8"
               >
-                <option value="once">Once</option>
-                <option value="monthly">Monthly</option>
-                <option value="quarterly">Quarterly</option>
-                <option value="biannual">Every 6 Months</option>
-                <option value="annual">Every Year</option>
+                <option value="once" className="bg-slate-900">Single Instance (Once)</option>
+                <option value="monthly" className="bg-slate-900">Monthly Array</option>
+                <option value="quarterly" className="bg-slate-900">Quarterly Re-sync</option>
+                <option value="biannual" className="bg-slate-900">Semi-Annual Cycle</option>
+                <option value="annual" className="bg-slate-900">Annual Calibration</option>
               </select>
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">First Due Date</label>
-              <div className="relative">
-                <Calendar className="absolute left-5 top-4 w-5 h-5 text-gray-400" />
-                <input 
-                  type="date" 
-                  required
-                  value={formData.nextDueDate}
-                  onChange={(e) => setFormData({...formData, nextDueDate: e.target.value})}
-                  className="w-full pl-14 pr-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all font-medium text-gray-900 shadow-inner"
-                />
+              <div className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2">
+                <ArrowRight className="w-4 h-4 text-slate-500 rotate-90" />
               </div>
             </div>
           </div>
 
-          {/* Reminder Options */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Remind me before</label>
-            <div className="grid grid-cols-4 gap-3">
-              {[0, 3, 7, 14].map(days => (
-                <button
-                  key={days}
-                  type="button"
-                  onClick={() => setFormData({...formData, reminderDaysBefore: days})}
-                  className={`py-3 rounded-xl font-bold text-sm transition-all border-2 ${
-                    formData.reminderDaysBefore === days 
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-lg' 
-                      : 'bg-white border-gray-100 text-gray-500 hover:border-blue-200'
-                  }`}
-                >
-                  {days === 0 ? 'Due Day' : `${days} Days`}
-                </button>
-              ))}
+          {/* Target Due Date Selection */}
+          <div className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+              <Timer className="w-3 h-3" />
+              Execution Target
+            </label>
+            <div className="relative group/input">
+              <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-indigo-400 transition-colors" />
+              <input 
+                type="date" 
+                required
+                value={formData.nextDueDate}
+                onChange={(e) => setFormData({...formData, nextDueDate: e.target.value})}
+                className="input-premium pl-16 py-5 [color-scheme:dark]"
+              />
             </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Notes & Instructions (Optional)</label>
-            <textarea 
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              placeholder="Include parts numbers, fluid types, or special steps..."
-              rows={4}
-              className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all font-medium text-gray-900 shadow-inner"
-            />
           </div>
         </div>
 
-        <div className="pt-6 border-t border-gray-100 flex gap-4">
+        {/* Reminder Array Settings */}
+        <div className="space-y-6 pt-6 border-t border-white/5 relative z-10">
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+            <Bell className="w-3 h-3 text-indigo-500" />
+            Alert Notification Buffer
+          </label>
+          <div className="flex flex-wrap gap-4">
+            {[0, 3, 7, 14].map(days => (
+              <button
+                key={days}
+                type="button"
+                onClick={() => setFormData({...formData, reminderDaysBefore: days})}
+                className={`px-8 py-5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${
+                  formData.reminderDaysBefore === days 
+                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/30' 
+                    : 'bg-white/5 border-white/5 text-slate-400 hover:border-white/20 hover:text-white'
+                }`}
+              >
+                {days === 0 ? 'Zero Buffer' : `${days} Day Lead`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Descriptive Metadata Input */}
+        <div className="space-y-4 pt-6 border-t border-white/5 relative z-10">
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+            <Database className="w-3 h-3" />
+            Procedure Schematics (Optional)
+          </label>
+          <textarea 
+            value={formData.description}
+            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            placeholder="Document parts indices, fluid specifications, or tactical steps..."
+            rows={4}
+            className="input-premium py-6 px-8"
+          />
+        </div>
+
+        {/* Control Array Actions */}
+        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row gap-6 relative z-10">
           <button
             type="submit"
             disabled={loading || assets.length === 0}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all disabled:opacity-50 text-xl tracking-tight"
+            className="btn-premium btn-premium-primary flex-1 h-[72px] text-lg shadow-2xl group/submit"
           >
-            {loading ? 'Scheduling...' : 'Confirm Schedule'}
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                Processing Ops...
+              </>
+            ) : (
+              <>
+                Confirm Schedule Commit
+                <ArrowRight className="w-6 h-6 group-hover/submit:translate-x-1 transition-transform" />
+              </>
+            )}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-8 py-5 bg-white text-gray-500 font-bold rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all"
+            className="btn-premium btn-premium-secondary h-[72px] px-10 border-white/5"
           >
-            Cancel
+            <X className="w-5 h-5 text-slate-500" />
+            Abort Operation
           </button>
         </div>
       </form>
@@ -221,9 +275,10 @@ export default function NewTaskPage() {
   return (
     <DashboardLayout>
       <Suspense fallback={
-        <div className="max-w-3xl mx-auto p-20 text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-500 font-bold">Loading form...</p>
+        <div className="max-w-4xl mx-auto p-32 text-center group">
+          <div className="glow-mesh" />
+          <div className="w-20 h-20 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mx-auto mb-8"></div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Synchronizing Application State...</p>
         </div>
       }>
         <NewTaskForm />

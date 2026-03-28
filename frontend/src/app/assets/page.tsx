@@ -11,7 +11,9 @@ import {
   Zap, 
   Trash2, 
   Search,
-  ChevronRight
+  ChevronRight,
+  Filter,
+  LayoutGrid
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -69,119 +71,140 @@ export default function AssetsPage() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'car': return 'bg-blue-50 text-blue-600'
-      case 'house': return 'bg-emerald-50 text-emerald-600'
-      case 'appliance': return 'bg-amber-50 text-amber-600'
-      default: return 'bg-gray-50 text-gray-600'
+      case 'car': return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+      case 'house': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+      case 'appliance': return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
     }
   }
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-12 pb-24">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Assets</h1>
-            <p className="text-gray-600">Manage your vehicles, property, and appliances</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+              Inventory <span className="text-emerald-500">Assets</span>
+            </h1>
+            <p className="text-slate-400 text-lg font-medium max-w-lg">
+              Catalog and track your physical hardware and infrastructures.
+            </p>
           </div>
           <Link 
             href="/assets/new" 
-            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
+            className="btn-premium btn-premium-primary"
           >
-            <Plus className="w-5 h-5 mr-2" />
-            Add New Asset
+            <Plus className="w-5 h-5" />
+            Initialize Asset
           </Link>
         </div>
 
-        {/* Search & Stats */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+        {/* Search & Stats Bar */}
+        <div className="flex flex-col lg:flex-row gap-6 items-center justify-between glass-card p-4 rounded-[2rem]">
+          <div className="relative w-full lg:max-w-md group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
             <input 
               type="text"
-              placeholder="Search assets..."
+              placeholder="Filter assets..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="input-premium pl-14 py-3 bg-slate-950/30"
             />
           </div>
-          <div className="flex gap-4 text-sm font-medium text-gray-500">
-            <span>{assets.length} Total Assets</span>
-            <span className="text-gray-300">|</span>
-            <span>{assets.filter(a => a.asset_type === 'car').length} Cars</span>
-            <span className="text-gray-300">|</span>
-            <span>{assets.filter(a => a.asset_type === 'house').length} Properties</span>
+          
+          <div className="flex items-center gap-8 px-6">
+            <div className="flex items-center gap-3">
+              <LayoutGrid className="w-4 h-4 text-slate-500" />
+              <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+                <span className="text-white">{assets.length}</span> Objects
+              </p>
+            </div>
+            <div className="w-[1px] h-4 bg-white/10" />
+            <div className="flex items-center gap-3">
+              <Filter className="w-4 h-4 text-slate-500" />
+              <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+                 Categorized
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Assets Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(i => <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-2xl" />)}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map(i => <div key={i} className="h-48 glass-card animate-pulse rounded-[2.5rem]" />)}
           </div>
         ) : filteredAssets.length === 0 ? (
-          <div className="bg-white border-2 border-dashed border-gray-200 rounded-3xl p-20 text-center">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Plus className="w-10 h-10 text-gray-300" />
+          <div className="glass-card rounded-[3rem] p-24 text-center relative overflow-hidden group">
+            <div className="glow-mesh" />
+            <div className="w-24 h-24 bg-slate-950 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-500">
+              <Plus className="w-10 h-10 text-slate-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">No assets found</h3>
-            <p className="text-gray-500 mt-2 mb-8 max-w-sm mx-auto">
-              Start by adding your first vehicle or property to get personalized maintenance reminders.
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Zero Assets Registered</h3>
+            <p className="text-slate-400 mb-10 max-w-sm mx-auto font-medium">
+              Start by initializing your first car, house, or appliance unit to begin monitoring operations.
             </p>
             <Link 
               href="/assets/new" 
-              className="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-md"
+              className="btn-premium btn-premium-primary inline-flex"
             >
-              Add Your First Asset
+              <Plus className="w-5 h-5" />
+              Begin Initialization
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAssets.map((asset) => (
               <div 
                 key={asset.id} 
-                className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all overflow-hidden flex flex-col"
+                className="group glass-card rounded-[2.5rem] hover:border-indigo-500/30 transition-all flex flex-col relative overflow-hidden"
               >
-                <div className="p-6 flex-1">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`p-3 rounded-xl ${getTypeColor(asset.asset_type)}`}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[40px] -z-10 group-hover:bg-indigo-600/5 transition-colors" />
+                
+                <div className="p-8 flex-1">
+                  <div className="flex items-start justify-between mb-8">
+                    <div className={`p-4 rounded-2xl border ${getTypeColor(asset.asset_type)} shadow-sm group-hover:scale-110 transition-transform duration-500`}>
                       {getTypeIcon(asset.asset_type)}
                     </div>
-                    <div className="flex gap-2">
-                       <button 
-                        onClick={() => handleDelete(asset.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                        title="Delete Asset"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
+                    <button 
+                      onClick={() => handleDelete(asset.id)}
+                      className="p-3 text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl border border-transparent hover:border-rose-500/20 transition-all"
+                      title="Decommission Asset"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
                   
-                  <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-indigo-400 transition-colors">
                     {asset.name}
                   </h3>
-                  <p className="text-sm text-gray-500 capitalize mb-4 flex items-center">
-                    {asset.asset_type}
-                    <span className="mx-2 text-gray-200">•</span>
-                    Added {new Date(asset.created_at).toLocaleDateString()}
-                  </p>
+                  <div className="flex items-center gap-2 mb-6 text-slate-500">
+                    <p className="text-[10px] font-black uppercase tracking-widest py-1 px-3 bg-white/5 rounded-full border border-white/5 text-slate-400">
+                      {asset.asset_type}
+                    </p>
+                    <span className="text-slate-700">•</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest">
+                      ID: {asset.id.slice(0, 8)}
+                    </p>
+                  </div>
                   
                   {asset.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                    <p className="text-sm font-medium text-slate-400 line-clamp-2 leading-relaxed h-10">
                       {asset.description}
                     </p>
                   )}
                 </div>
 
-                <Link 
-                  href={`/assets/${asset.id}`} 
-                  className="bg-gray-50 px-6 py-4 flex items-center justify-between text-sm font-bold text-gray-700 hover:bg-blue-600 hover:text-white transition-all border-t border-gray-100"
-                >
-                  View Details
-                  <ChevronRight className="w-5 h-5 opacity-50 group-hover:opacity-100" />
-                </Link>
+                <div className="p-4 bg-white/[0.02] border-t border-white/5 group-hover:bg-indigo-500 transition-all">
+                  <Link 
+                    href={`/assets/${asset.id}`} 
+                    className="flex items-center justify-between px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-300 group-hover:text-white"
+                  >
+                    View Unit State
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

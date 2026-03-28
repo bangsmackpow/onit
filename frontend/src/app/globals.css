@@ -1,64 +1,97 @@
 /* frontend/src/app/globals.css */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --primary: 94 114 228;
+  --secondary: 15 23 42;
+  --accent: 79 70 229;
+  --success: 16 185 129;
+  --warning: 245 158 11;
+  --danger: 239 68 68;
+  --bg-slate: 2 6 23;
+  --glass-bg: rgba(30, 41, 59, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
-html {
-  scroll-behavior: smooth;
+@layer base {
+  body {
+    @apply bg-[#020617] text-slate-300 font-sans selection:bg-indigo-500/30;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4, .font-display {
+    @apply font-display text-white tracking-tight;
+  }
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Utility classes */
 @layer components {
-  .btn-primary {
-    @apply px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors;
+  /* Premium Dashboard Gradients */
+  .bg-dashboard-radial {
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent 40%);
   }
 
-  .btn-secondary {
-    @apply px-4 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 transition-colors;
+  /* Glassmorphism Components */
+  .glass-card {
+    @apply bg-slate-900/40 backdrop-blur-xl border border-white/5 shadow-2xl;
+  }
+  
+  .glass-sidebar {
+    @apply bg-slate-900/60 backdrop-blur-3xl border-r border-white/5;
   }
 
-  .btn-danger {
-    @apply px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors;
+  /* Refined Navigation */
+  .nav-item {
+    @apply flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group;
+  }
+  .nav-item-active {
+    @apply bg-indigo-500/10 text-indigo-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] border-l-2 border-indigo-500 pl-[14px];
+  }
+  .nav-item-inactive {
+    @apply text-slate-400 hover:bg-white/5 hover:text-slate-100;
   }
 
-  .input-base {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  /* Interactive Buttons */
+  .btn-premium {
+    @apply relative overflow-hidden px-6 py-3 rounded-2xl font-bold transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+  }
+  .btn-premium-primary {
+    @apply bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-500 hover:shadow-indigo-600/30;
+  }
+  .btn-premium-secondary {
+    @apply bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 hover:border-white/20 backdrop-blur-sm;
+  }
+  .btn-premium-ghost {
+    @apply text-slate-400 hover:text-slate-100 hover:bg-white/5;
   }
 
-  .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  /* Form Elements */
+  .input-premium {
+    @apply w-full px-5 py-4 bg-slate-950/50 border border-white/10 rounded-2xl outline-none transition-all duration-300 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-600 text-slate-100;
   }
+
+  /* Decorative Layout */
+  .glow-mesh {
+    @apply absolute -inset-px opacity-30 blur-3xl pointer-events-none;
+    background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.4), transparent 50%);
+  }
+}
+
+/* Custom Scrollbar (Sleek) */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+}
+
+/* Smooth Focus Rings */
+:focus-visible {
+  @apply outline-none ring-2 ring-indigo-500/50 ring-offset-2 ring-offset-slate-950;
 }

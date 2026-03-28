@@ -1,11 +1,11 @@
-// frontend/src/app/login/page.tsx
+// frontend/src/app/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
-import { Mail, Lock, AlertCircle } from 'lucide-react'
+import { Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, Zap } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,61 +40,80 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen relative flex items-center justify-center p-6 overflow-hidden">
+      {/* Immersive Background */}
+      <div className="absolute inset-0 bg-slate-950 -z-20" />
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-600/10 blur-[150px] -z-10 animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-600/5 blur-[120px] -z-10" />
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none -z-10" />
+
+      <div className="w-full max-w-[480px] relative">
+        {/* Glow behind card */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-emerald-500/20 blur-2xl -z-10 rounded-[3rem]" />
+        
+        <div className="glass-card rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden">
+          <div className="glow-mesh" />
+          
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4">
-              <Lock className="w-6 h-6 text-blue-600" />
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-indigo-600 rounded-[2rem] mb-8 shadow-2xl shadow-indigo-600/40 relative group overflow-hidden">
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+              <Zap className="w-10 h-10 text-white relative z-10" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-600 mt-2">Sign in to your maintenance account</p>
+            <h1 className="text-4xl font-black text-white tracking-tighter mb-3">
+              ONIT<span className="text-indigo-500">.</span>
+            </h1>
+            <p className="text-slate-400 font-medium text-sm tracking-wide">Enter your credentials to synchronize </p>
           </div>
 
           {/* Error Message */}
           {(error || localError) && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-red-800 text-sm">{error || localError}</p>
+            <div className="mb-8 p-5 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+              <p className="text-rose-200 text-xs font-semibold leading-relaxed">{error || localError}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
+                Identity Profile
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="input-base pl-10"
+                  placeholder="name@nexus.com"
+                  className="input-premium pl-14"
                   disabled={loading}
                 />
               </div>
             </div>
 
             {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+            <div className="space-y-2">
+              <div className="flex justify-between items-center px-4">
+                <label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  Access Key
+                </label>
+                <Link href="/forgot" className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 hover:text-indigo-300 transition-colors">
+                  Recovery
+                </Link>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
                 <input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-base pl-10"
+                  className="input-premium pl-14"
                   disabled={loading}
                 />
               </div>
@@ -104,21 +123,42 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-premium btn-premium-primary w-full h-[64px] text-base group mt-4 shadow-xl"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Synchronizing...
+                </div>
+              ) : (
+                <>
+                  Establish Connection
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
           </form>
 
           {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-            <p className="text-gray-600 text-sm">
-              Don't have an account?{' '}
-              <Link href="/register" className="text-blue-600 font-medium hover:text-blue-700">
-                Create one
-              </Link>
+          <div className="mt-12 pt-8 border-t border-white/5 text-center">
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.1em]">
+              Unauthorized Access Prohibited
             </p>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-500/50" />
+              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Secure Quantum Protocol Enabled</span>
+            </div>
           </div>
+        </div>
+        
+        {/* Bottom Link */}
+        <div className="mt-8 text-center">
+          <p className="text-slate-400 text-sm font-medium">
+            New operative?{' '}
+            <Link href="/register" className="text-indigo-400 font-black hover:text-white transition-all underline decoration-indigo-500/30 underline-offset-4">
+              Initialize Account
+            </Link>
+          </p>
         </div>
       </div>
     </div>

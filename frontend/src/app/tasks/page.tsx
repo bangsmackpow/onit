@@ -10,6 +10,13 @@ import {
   Calendar,
   DollarSign,
   Activity,
+  ArrowRight,
+  Zap,
+  Clock,
+  ShieldCheck,
+  ChevronRight,
+  TrendingDown,
+  X
 } from 'lucide-react'
 import Link from 'next/link'
 import { format, isBefore, parseISO } from 'date-fns'
@@ -77,39 +84,43 @@ export default function TasksPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto space-y-8 pb-20">
+      <div className="max-w-7xl mx-auto space-y-12 pb-24">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Maintenance Pipeline</h1>
-            <p className="text-gray-600">Track and complete your scheduled tasks</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+              Maintenance <span className="text-indigo-500">Pipeline</span>
+            </h1>
+            <p className="text-slate-400 text-lg font-medium max-w-lg">
+              Manage and execute scheduled maintenance protocols across your assets.
+            </p>
           </div>
           <Link 
             href="/tasks/new" 
-            className="inline-flex items-center px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
+            className="btn-premium btn-premium-primary"
           >
-            <Plus className="w-5 h-5 mr-2" />
-            Schedule New Task
+            <Plus className="w-5 h-5" />
+            Schedule Protocol
           </Link>
         </div>
 
         {/* Filter Bar */}
-        <div className="flex bg-white p-2 rounded-2xl border border-gray-200 shadow-sm w-fit">
+        <div className="flex flex-wrap items-center gap-3 p-2 rounded-[2rem] glass-card w-fit border-white/5">
           <button 
             onClick={() => setFilter('all')}
-            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${filter === 'all' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
+            className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'all' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
           >
-            All Tasks
+            All Ops
           </button>
           <button 
             onClick={() => setFilter('overdue')}
-            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${filter === 'overdue' ? 'bg-red-50 text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
+            className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'overdue' ? 'bg-rose-500/10 text-rose-400 shadow-sm border border-rose-500/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
           >
-            Overdue
+            Critical Delay
           </button>
           <button 
             onClick={() => setFilter('upcoming')}
-            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${filter === 'upcoming' ? 'bg-emerald-50 text-emerald-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
+            className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'upcoming' ? 'bg-emerald-500/10 text-emerald-400 shadow-sm border border-emerald-500/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
           >
             Upcoming
           </button>
@@ -117,61 +128,71 @@ export default function TasksPage() {
 
         {/* Tasks List */}
         {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-gray-100 animate-pulse rounded-2xl" />)}
+          <div className="space-y-6">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 glass-card animate-pulse rounded-[2.5rem]" />)}
           </div>
         ) : filteredTasks.length === 0 ? (
-          <div className="bg-white border-2 border-dashed border-gray-200 rounded-3xl p-20 text-center">
-             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-10 h-10 text-gray-300" />
+          <div className="glass-card rounded-[3rem] p-24 text-center relative overflow-hidden group">
+            <div className="glow-mesh" />
+            <div className="w-24 h-24 bg-slate-950 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-500">
+              <CheckCircle2 className="w-10 h-10 text-slate-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">No tasks found</h3>
-            <p className="text-gray-500 mt-2 mb-8 max-w-sm mx-auto">
-              {filter === 'all' ? 'Your maintenance pipeline is empty. Add an asset and schedule some tasks.' : `No ${filter} tasks found.`}
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Pipeline Clear</h3>
+            <p className="text-slate-400 mb-10 max-w-sm mx-auto font-medium">
+              {filter === 'all' ? 'All scheduled maintenance operations have been reconciled. System is at high performance.' : `No pending items detected for the '${filter}' filter criteria.`}
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid gap-6">
             {filteredTasks.map((task) => {
               const isOverdue = isBefore(parseISO(task.next_due_date), new Date())
               return (
                 <div 
                   key={task.id} 
-                  className={`group bg-white p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all flex flex-col md:flex-row md:items-center gap-6`}
+                  className="group glass-card p-8 rounded-[2.5rem] flex flex-col md:flex-row md:items-center gap-8 hover:border-indigo-500/30 transition-all overflow-hidden relative"
                 >
-                  <div className={`p-4 rounded-2xl flex-shrink-0 ${isOverdue ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'} group-hover:scale-110 transition-transform`}>
+                  <div className={`absolute top-0 right-0 w-32 h-32 blur-[40px] -z-10 group-hover:opacity-40 transition-opacity ${isOverdue ? 'bg-rose-600/10' : 'bg-indigo-600/10'}`} />
+                  
+                  <div className={`p-5 rounded-2xl flex-shrink-0 border transition-all group-hover:scale-110 duration-500 ${isOverdue ? 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-lg shadow-rose-600/10' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-lg shadow-indigo-600/10'}`}>
                     <Calendar className="w-8 h-8" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-xl font-black text-gray-900 truncate">{task.task_name}</h3>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${isOverdue ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                        {isOverdue ? 'Overdue' : 'Pending'}
-                      </span>
+                    <div className="flex items-center gap-4 mb-3">
+                      <h3 className="text-2xl font-black text-white truncate group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{task.task_name}</h3>
+                      <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border ${isOverdue ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'}`}>
+                        {isOverdue ? 'Critical' : 'Pending'}
+                      </div>
                     </div>
-                    <p className="text-sm font-bold text-gray-500 flex items-center">
-                      {task.asset_name}
-                      <span className="mx-2 text-gray-200">•</span>
-                      Recurrence: <span className="text-blue-600 ml-1 capitalize">{task.recurrence_type}</span>
-                    </p>
-                    {task.description && <p className="text-sm text-gray-400 mt-2 line-clamp-1">{task.description}</p>}
+                    <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-slate-700" />
+                        <span className="uppercase tracking-widest">{task.asset_name}</span>
+                      </div>
+                      <div className="w-[1px] h-3 bg-white/10" />
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-slate-700" />
+                        <span className="uppercase tracking-widest">{task.recurrence_type}</span>
+                      </div>
+                    </div>
+                    {task.description && <p className="text-sm font-medium text-slate-500 mt-4 line-clamp-1 max-w-2xl">{task.description}</p>}
                   </div>
 
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-8">
                     <div className="text-right flex-shrink-0">
-                      <p className={`text-lg font-black ${isOverdue ? 'text-red-600' : 'text-gray-900'}`}>
+                      <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`}>Target Date</p>
+                      <p className={`text-xl font-black ${isOverdue ? 'text-rose-400' : 'text-white'}`}>
                         {format(parseISO(task.next_due_date), 'MMM d, yyyy')}
                       </p>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Next Due Date</p>
                     </div>
                     
                     <button 
                       onClick={() => setCompletingTaskId(task.id)}
-                      className="inline-flex items-center justify-center px-6 py-3 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-2xl font-black transition-all shadow-sm active:scale-95"
+                      className="btn-premium btn-premium-secondary group/btn border-indigo-500/30"
                     >
-                      <CheckCircle2 className="w-5 h-5 mr-2" />
-                      Complete
+                      <CheckCircle2 className="w-5 h-5 text-indigo-500 group-hover/btn:text-white" />
+                      Reconcile
+                      <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -183,65 +204,87 @@ export default function TasksPage() {
 
       {/* Completion Modal */}
       {completingTaskId && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setCompletingTaskId(null)}></div>
-          <div className="relative bg-white w-full max-w-xl rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="p-8 md:p-10">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Task Completion</h2>
-                <button onClick={() => setCompletingTaskId(null)} className="p-2 text-gray-400 hover:bg-gray-100 rounded-full">
-                  <Plus className="w-6 h-6 rotate-45" />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 sm:p-12 transition-all duration-500">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-500" onClick={() => setCompletingTaskId(null)}></div>
+          <div className="relative glass-card w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500 border-white/10">
+            <div className="glow-mesh" />
+            
+            <div className="p-10 md:p-16 relative z-10">
+              <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                    <ShieldCheck className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black text-white tracking-tight">Reconciliation</h2>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Protocol Execution Record</p>
+                  </div>
+                </div>
+                <button onClick={() => setCompletingTaskId(null)} className="p-3 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl transition-all">
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 
-              <form onSubmit={handleComplete} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Completion Notes</label>
+              <form onSubmit={handleComplete} className="space-y-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
+                    <Zap className="w-3 h-3" />
+                    Operation Notes
+                  </label>
                   <textarea 
                     value={completionData.notes}
                     onChange={(e) => setCompletionData({...completionData, notes: e.target.value})}
-                    placeholder="e.g. Changed oil, verified levels are good."
-                    className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all placeholder-gray-400 shadow-inner"
-                    rows={3}
+                    placeholder="Document the maintenance procedure findings..."
+                    className="input-premium py-5 px-6"
+                    rows={4}
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Mileage (optional)</label>
-                    <div className="relative">
-                      <Activity className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
+                      <TrendingDown className="w-3 h-3" />
+                      Usage Metrics
+                    </label>
+                    <div className="relative group/input">
+                      <Activity className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-indigo-400 transition-colors" />
                       <input 
                         type="number"
                         value={completionData.mileage}
                         onChange={(e) => setCompletionData({...completionData, mileage: e.target.value})}
-                        placeholder="75,042"
-                        className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all shadow-inner"
+                        placeholder="Current Mileage"
+                        className="input-premium pl-14 h-16"
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Cost USD (optional)</label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
+                      <DollarSign className="w-3 h-3" />
+                      Resource Allocation
+                    </label>
+                    <div className="relative group/input">
+                      <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-indigo-400 transition-colors" />
                       <input 
                         type="number"
                         step="0.01"
                         value={completionData.costUsd}
                         onChange={(e) => setCompletionData({...completionData, costUsd: e.target.value})}
-                        placeholder="45.99"
-                        className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all shadow-inner"
+                        placeholder="Total Cost (USD)"
+                        className="input-premium pl-14 h-16"
                       />
                     </div>
                   </div>
                 </div>
 
-                <button 
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-3xl shadow-xl hover:shadow-2xl transition-all text-xl mt-4"
-                >
-                  Mark as Complete
-                </button>
+                <div className="pt-8">
+                  <button 
+                    type="submit"
+                    className="btn-premium btn-premium-primary w-full h-[72px] text-lg shadow-2xl group/sub"
+                  >
+                    Confirm Reconciliation
+                    <ArrowRight className="w-6 h-6 group-hover/sub:translate-x-1 transition-transform" />
+                  </button>
+                </div>
               </form>
             </div>
           </div>
