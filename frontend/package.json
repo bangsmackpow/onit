@@ -1,38 +1,44 @@
 {
-  "name": "maintenance-scheduler-frontend",
+  "name": "frontend",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev:frontend": "next dev --port 3000",
-    "build:frontend": "next build",
-    "start": "next start",
+    "dev": "next dev",
+    "dev:pages": "wrangler pages dev .next --d1 DB",
+    "build": "next build",
     "lint": "next lint",
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:frontend\"",
-    "build": "npm run build:api && npm run build:frontend",
-    "deploy": "wrangler publish"
+    "deploy": "wrangler pages deploy .next",
+    "migrate:local": "wrangler d1 execute maintenance-scheduler --local --file=../migrations/001_init.sql"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "axios": "^1.6.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "hono": "^4.12.9",
+    "jose": "^5.10.0",
+    "lucide-react": "^0.294.0",
+    "nanoid": "^3.3.11",
     "next": "^14.0.0",
     "next-pwa": "^5.6.0",
-    "axios": "^1.6.0",
-    "zustand": "^4.4.0",
-    "date-fns": "^2.30.0",
-    "clsx": "^2.0.0",
-    "lucide-react": "^0.294.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.25.76",
+    "zustand": "^4.4.0"
   },
   "devDependencies": {
-    "typescript": "^5.3.0",
+    "@cloudflare/workers-types": "^4.20260317.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "@types/node": "^20.0.0",
-    "tailwindcss": "^3.3.0",
-    "postcss": "^8.4.0",
     "autoprefixer": "^10.4.0",
+    "concurrently": "^8.2.0",
     "eslint": "^8.50.0",
     "eslint-config-next": "^14.0.0",
-    "concurrently": "^8.2.0"
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.3.0"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -2,7 +2,7 @@
 import axios, { AxiosInstance, AxiosError } from 'axios'
 import { useAuthStore } from '@/store/authStore'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
+const API_URL = '/api'
 
 let apiClient: AxiosInstance
 

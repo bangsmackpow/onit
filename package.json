@@ -1,0 +1,38 @@
+{
+  "name": "maintenance-scheduler",
+  "version": "0.1.0",
+  "description": "Serverless multi-tenant maintenance scheduling app on Cloudflare",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w frontend",
+    "build": "npm run build -w frontend",
+    "deploy": "npm run deploy -w frontend",
+    "lint": "npm run lint -w frontend",
+    "test": "npm run test -w frontend",
+    "clean": "rm -rf frontend/.next frontend/node_modules node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/maintenance-scheduler.git"
+  },
+  "keywords": [
+    "maintenance",
+    "scheduling",
+    "cloudflare",
+    "serverless",
+    "saas",
+    "multi-tenant"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

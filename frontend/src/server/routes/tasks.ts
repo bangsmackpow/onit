@@ -2,12 +2,9 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
+import { Env, Variables } from '../types'
 
-interface Env {
-  DB: D1Database
-}
-
-const tasks = new Hono<{ Bindings: Env }>()
+const tasks = new Hono<{ Bindings: Env, Variables: Variables }>()
 
 const CreateTaskSchema = z.object({
   assetId: z.string().min(1),
@@ -64,8 +61,8 @@ function calculateNextDueDate(currentDue: Date, recurrenceType: string, interval
 // ============================================================================
 tasks.get('/', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
-    const db = c.env.DB as D1Database
+    const tenantId = c.get('tenantId')
+    const db = c.env.DB
 
     // Get all tasks with assignment info
     const result = await db
@@ -104,9 +101,9 @@ tasks.get('/', async (c) => {
 // ============================================================================
 tasks.get('/:id', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
+    const tenantId = c.get('tenantId')
     const taskId = c.req.param('id')
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     const task = await db
       .prepare('SELECT * FROM maintenance_tasks WHERE id = ? AND tenant_id = ?')
@@ -140,12 +137,12 @@ tasks.get('/:id', async (c) => {
 // ============================================================================
 tasks.post('/', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
-    const userId = c.get('userId') as string
+    const tenantId = c.get('tenantId')
+    const userId = c.get('userId')
     const body = await c.req.json()
     const validated = CreateTaskSchema.parse(body)
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
     const taskId = nanoid()
 
     // Verify asset belongs to tenant
@@ -221,13 +218,13 @@ tasks.post('/', async (c) => {
 // ============================================================================
 tasks.post('/:id/complete', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
-    const userId = c.get('userId') as string
+    const tenantId = c.get('tenantId')
+    const userId = c.get('userId')
     const taskId = c.req.param('id')
     const body = await c.req.json()
     const validated = CompleteTaskSchema.parse(body)
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     // Verify task belongs to tenant
     const task = await db
@@ -302,13 +299,13 @@ tasks.post('/:id/complete', async (c) => {
 // ============================================================================
 tasks.post('/:id/snooze', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
-    const userId = c.get('userId') as string
+    const tenantId = c.get('tenantId')
+    const userId = c.get('userId')
     const taskId = c.req.param('id')
     const body = await c.req.json()
     const validated = SnoozeTaskSchema.parse(body)
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     // Verify task
     const task = await db
@@ -322,7 +319,7 @@ tasks.post('/:id/snooze', async (c) => {
 
     // Calculate snooze date
     const snoozedUntil = new Date()
-    snoozedUntil.setDate(snoozedUntil.getDate() + validated.snoozeDays)
+    snoozedUntil.setDate(snoozedUntil.getDate() + Number(validated))
 
     // Insert snooze record
     await db
@@ -338,11 +335,11 @@ tasks.post('/:id/snooze', async (c) => {
         userId,
         task.next_due_date,
         snoozedUntil.toISOString().split('T')[0],
-        validated.snoozeDays
+        validated
       )
       .run()
 
-    return c.json({ success: true, message: `Reminder snoozed for ${validated.snoozeDays} days` })
+    return c.json({ success: true, message: `Reminder snoozed for ${validated} days` })
   } catch (error) {
     console.error('Error snoozing task:', error)
     if (error instanceof z.ZodError) {

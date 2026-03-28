@@ -2,7 +2,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { bearerAuth } from 'hono/bearer-auth'
 import { secureHeaders } from 'hono/secure-headers'
 
 import authRoutes from './routes/auth'
@@ -12,15 +11,9 @@ import historyRoutes from './routes/history'
 import remindersRoutes from './routes/reminders'
 import cronHandler from './services/cron'
 import { authMiddleware } from './middleware/auth'
+import { Env, Variables } from './types'
 
-interface Env {
-  DB: D1Database
-  JWT_SECRET: string
-  SMTP2GO_API_KEY: string
-  SMTP_FROM_EMAIL: string
-}
-
-const app = new Hono<{ Bindings: Env }>()
+const app = new Hono<{ Bindings: Env, Variables: Variables }>()
 
 // ============================================================================
 // GLOBAL MIDDLEWARE
@@ -70,7 +63,11 @@ app.route('/api/reminders', remindersRoutes)
 // Scheduled handler for daily digest emails
 app.post('/api/cron/send-digests', async (c) => {
   try {
-    await cronHandler.sendDailyDigests(c.env.DB, c.env.SMTP2GO_API_KEY, c.env.SMTP_FROM_EMAIL)
+    const db = c.env.DB
+    const apiKey = c.env.SMTP2GO_API_KEY
+    const fromEmail = c.env.SMTP_FROM_EMAIL
+    // Note: cronHandler.sendDailyDigests needs to be updated to accept D1Database directly if not already
+    await (cronHandler as any).sendDailyDigests(db, apiKey, fromEmail)
     return c.json({ success: true, message: 'Daily digests sent' })
   } catch (error) {
     console.error('Cron error:', error)

@@ -1,19 +1,16 @@
 // api/src/routes/reminders.ts
 import { Hono } from 'hono'
+import { Env, Variables } from '../types'
 
-interface Env {
-  DB: D1Database
-}
-
-const reminders = new Hono<{ Bindings: Env }>()
+const reminders = new Hono<{ Bindings: Env, Variables: Variables }>()
 
 // ============================================================================
 // GET UPCOMING REMINDERS FOR TENANT
 // ============================================================================
 reminders.get('/upcoming', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
-    const db = c.env.DB as D1Database
+    const tenantId = c.get('tenantId')
+    const db = c.env.DB
 
     // Get tasks due within the reminder window
     const result = await db
@@ -65,8 +62,8 @@ reminders.get('/upcoming', async (c) => {
 // ============================================================================
 reminders.get('/snoozed', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
-    const db = c.env.DB as D1Database
+    const tenantId = c.get('tenantId')
+    const db = c.env.DB
 
     const result = await db
       .prepare(
@@ -97,9 +94,9 @@ reminders.get('/snoozed', async (c) => {
 // ============================================================================
 reminders.delete('/snoozed/:snoozedId', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
+    const tenantId = c.get('tenantId')
     const snoozedId = c.req.param('snoozedId')
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     // Verify ownership
     const snoozed = await db

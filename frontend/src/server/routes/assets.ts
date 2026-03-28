@@ -2,12 +2,9 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
+import { Env, Variables } from '../types'
 
-interface Env {
-  DB: D1Database
-}
-
-const assets = new Hono<{ Bindings: Env }>()
+const assets = new Hono<{ Bindings: Env, Variables: Variables }>()
 
 const CreateAssetSchema = z.object({
   name: z.string().min(1).max(200),
@@ -27,7 +24,7 @@ const UpdateAssetSchema = z.object({
 assets.get('/', async (c) => {
   try {
     const tenantId = c.get('tenantId') as string
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     const result = await db
       .prepare('SELECT * FROM assets WHERE tenant_id = ? ORDER BY created_at DESC')
@@ -58,7 +55,7 @@ assets.get('/:id', async (c) => {
   try {
     const tenantId = c.get('tenantId') as string
     const assetId = c.req.param('id')
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     const asset = await db
       .prepare('SELECT * FROM assets WHERE id = ? AND tenant_id = ?')
@@ -85,7 +82,7 @@ assets.post('/', async (c) => {
     const body = await c.req.json()
     const validated = CreateAssetSchema.parse(body)
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
     const assetId = nanoid()
 
     await db
@@ -120,7 +117,7 @@ assets.put('/:id', async (c) => {
     const body = await c.req.json()
     const validated = UpdateAssetSchema.parse(body)
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     // Check ownership
     const asset = await db
@@ -178,7 +175,7 @@ assets.delete('/:id', async (c) => {
   try {
     const tenantId = c.get('tenantId') as string
     const assetId = c.req.param('id')
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     // Check ownership
     const asset = await db

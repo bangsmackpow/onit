@@ -1,16 +1,16 @@
 // api/src/middleware/auth.ts
-import { Context, Next } from 'hono'
+import { Next } from 'hono'
 import * as jose from 'jose'
+import { Env, Variables } from '../types'
+import { Context } from 'hono'
 
-interface JWTPayload {
+export interface JWTPayload extends jose.JWTPayload {
   userId: string
   tenantId: string
   email: string
-  iat: number
-  exp: number
 }
 
-export async function authMiddleware(c: Context, next: Next) {
+export async function authMiddleware(c: Context<{ Bindings: Env; Variables: Variables }>, next: Next) {
   const authHeader = c.req.header('Authorization')
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,7 +23,7 @@ export async function authMiddleware(c: Context, next: Next) {
     const secret = new TextEncoder().encode(c.env.JWT_SECRET)
     const verified = await jose.jwtVerify(token, secret)
     
-    const payload = verified.payload as unknown as JWTPayload
+    const payload = verified.payload as JWTPayload
 
     // Attach user context to request
     c.set('userId', payload.userId)
@@ -50,7 +50,7 @@ export async function generateJWT(
   const alg = 'HS256'
   const secretBytes = new TextEncoder().encode(secret)
 
-  const token = await jose.SignJWT({
+  const token = await new jose.SignJWT({
     userId,
     tenantId,
     email,
@@ -69,5 +69,5 @@ export async function generateJWT(
 export async function verifyJWT(token: string, secret: string): Promise<JWTPayload> {
   const secretBytes = new TextEncoder().encode(secret)
   const verified = await jose.jwtVerify(token, secretBytes)
-  return verified.payload as unknown as JWTPayload
+  return verified.payload as JWTPayload
 }

@@ -1,23 +1,20 @@
 // api/src/routes/history.ts
 import { Hono } from 'hono'
+import { Env, Variables } from '../types'
 
-interface Env {
-  DB: D1Database
-}
-
-const history = new Hono<{ Bindings: Env }>()
+const history = new Hono<{ Bindings: Env, Variables: Variables }>()
 
 // ============================================================================
 // GET HISTORY FOR A TASK
 // ============================================================================
 history.get('/task/:taskId', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
+    const tenantId = c.get('tenantId')
     const taskId = c.req.param('taskId')
     const limit = c.req.query('limit') || '20'
     const offset = c.req.query('offset') || '0'
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     // Verify task belongs to tenant
     const task = await db
@@ -69,11 +66,11 @@ history.get('/task/:taskId', async (c) => {
 // ============================================================================
 history.get('/', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
+    const tenantId = c.get('tenantId')
     const limit = c.req.query('limit') || '50'
     const offset = c.req.query('offset') || '0'
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     const result = await db
       .prepare(
@@ -118,10 +115,10 @@ history.get('/', async (c) => {
 // ============================================================================
 history.get('/task/:taskId/metrics', async (c) => {
   try {
-    const tenantId = c.get('tenantId') as string
+    const tenantId = c.get('tenantId')
     const taskId = c.req.param('taskId')
 
-    const db = c.env.DB as D1Database
+    const db = c.env.DB
 
     // Verify task
     const task = await db

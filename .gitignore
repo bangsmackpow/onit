@@ -1,0 +1,60 @@
+# node.js
+node_modules/
+dist/
+build/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Wrangler / Cloudflare
+.wrangler/
+.devjs/
+worker-bundle/
+.capnp/
+preview/
+.mf/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Databases
+*.sqlite
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Typescript
+*.tsbuildinfo

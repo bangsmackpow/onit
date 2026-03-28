@@ -9,19 +9,7 @@ const nextConfig = {
   images: {
     unoptimized: true, // Required for static export
   },
-  // Redirect API calls to Cloudflare Workers
-  rewrites: async () => {
-    return {
-      beforeFiles: [
-        {
-          source: '/api/:path*',
-          destination: process.env.NEXT_PUBLIC_API_URL
-            ? `${process.env.NEXT_PUBLIC_API_URL}/:path*`
-            : 'http://localhost:8787/api/:path*', // Local dev
-        },
-      ],
-    }
-  },
+  // No rewrites needed as API is integrated via Pages Functions
   headers: async () => {
     return [
       {
