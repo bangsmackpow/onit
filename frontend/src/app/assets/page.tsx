@@ -9,9 +9,7 @@ import {
   Car, 
   Home, 
   Zap, 
-  MoreVertical, 
   Trash2, 
-  Edit,
   Search,
   ChevronRight
 } from 'lucide-react'

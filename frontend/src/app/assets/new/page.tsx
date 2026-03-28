@@ -5,15 +5,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { apiPost } from '@/lib/apiClient'
-import { ASSET_TEMPLATES, AssetTemplate, TaskTemplate } from '@/lib/templates'
+import { ASSET_TEMPLATES, AssetTemplate } from '@/lib/templates'
 import { 
   Car, 
   Home, 
   Zap, 
   ArrowLeft, 
   Check, 
-  Plus, 
-  Info,
   Calendar,
   AlertCircle
 } from 'lucide-react'

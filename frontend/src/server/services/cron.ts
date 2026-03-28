@@ -163,7 +163,7 @@ async function sendDailyDigests(
  * Check if it's time to send digest based on user's timezone and preference
  * (simplified: just check if it's around their preferred time UTC)
  */
-function isTimeToSendDigest(digestTime: string, timezone: string): boolean {
+function isTimeToSendDigest(digestTime: string, _timezone: string): boolean {
   // Simplified: just check if current UTC hour is within 1 hour of digest time
   // In production, implement proper timezone conversion
   const [digestHour] = digestTime.split(':').map(Number)

@@ -10,8 +10,7 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   Calendar,
-  ChevronRight,
-  Tool
+  ChevronRight
 } from 'lucide-react'
 import Link from 'next/link'
 import { format, isBefore, addDays, parseISO } from 'date-fns'

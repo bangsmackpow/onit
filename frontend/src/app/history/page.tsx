@@ -7,14 +7,13 @@ import { apiGet } from '@/lib/apiClient'
 import { 
   History as HistoryIcon,
   Search,
-  ChevronRight,
   Filter,
   DollarSign,
   Activity,
-  User,
-  Tool
+  User
 } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
+import Link from 'next/link'
 
 interface HistoryRecord {
   id: string

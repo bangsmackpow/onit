@@ -10,11 +10,9 @@ import {
   Package, 
   CheckSquare, 
   History, 
-  Settings, 
   LogOut, 
   Menu, 
-  X,
-  PlusCircle
+  X
 } from 'lucide-react'
 import { useState } from 'react'
 

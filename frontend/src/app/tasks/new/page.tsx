@@ -8,8 +8,6 @@ import { apiGet, apiPost } from '@/lib/apiClient'
 import { 
   ArrowLeft, 
   Calendar, 
-  CheckCircle2, 
-  Clock, 
   FileText,
   AlertCircle
 } from 'lucide-react'
