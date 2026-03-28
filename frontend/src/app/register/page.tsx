@@ -70,9 +70,9 @@ export default function RegisterPage() {
               <User className="w-10 h-10 text-white relative z-10" />
             </div>
             <h1 className="text-4xl font-black text-white tracking-tighter mb-3">
-              IDENTITY PROFILE
+              CREATE ACCOUNT
             </h1>
-            <p className="text-slate-400 font-medium text-sm tracking-wide">Initialize your secure operative credentials</p>
+            <p className="text-slate-400 font-medium text-sm tracking-wide">Enter your information below to get started</p>
           </div>
 
           {/* Error Message */}
@@ -88,7 +88,7 @@ export default function RegisterPage() {
             {/* Full Name */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
-                Operative Name *
+                Name *
               </label>
               <div className="relative group">
                 <User className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
@@ -107,7 +107,7 @@ export default function RegisterPage() {
             {/* Email */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
-                Identity Profile *
+                Email Address *
               </label>
               <div className="relative group">
                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
@@ -116,17 +116,17 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="name@nexus.com"
+                  placeholder="name@example.com"
                   className="input-premium pl-14"
                   disabled={loading}
                 />
               </div>
             </div>
 
-            {/* Tenant/Company Name */}
+            {/* Household Name */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
-                Organization (Optional)
+                Household Name (Optional)
               </label>
               <div className="relative group">
                 <Building className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
@@ -134,7 +134,7 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.tenantName}
                   onChange={(e) => setFormData({ ...formData, tenantName: e.target.value })}
-                  placeholder="Nexus Operations"
+                  placeholder="The Smith Home"
                   className="input-premium pl-14"
                   disabled={loading}
                 />
@@ -144,7 +144,7 @@ export default function RegisterPage() {
             {/* Password */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
-                Access Key *
+                Password *
               </label>
               <div className="relative group">
                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
@@ -170,11 +170,11 @@ export default function RegisterPage() {
               {loading ? (
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Initializing Profile...
+                  Creating Account...
                 </div>
               ) : (
                 <>
-                  Initialize Profile
+                  Create Account
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -184,23 +184,21 @@ export default function RegisterPage() {
           {/* Footer */}
           <div className="mt-12 pt-8 border-t border-white/5 text-center">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.1em]">
-              Security Clearance Verification Required
+              Secure Registration Protected
             </p>
             <div className="mt-4 flex items-center justify-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-500/50" />
-              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Quantum Encryption Active</span>
+              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">TLS 1.3 Encryption Active</span>
             </div>
           </div>
         </div>
         
         {/* Bottom Link */}
-        <div className="mt-8 text-center">
-          <p className="text-slate-400 text-sm font-medium">
-            Existing operative?{' '}
-            <Link href="/" className="text-indigo-400 font-black hover:text-white transition-all underline decoration-indigo-500/30 underline-offset-4">
-              Return to Nexus
-            </Link>
-          </p>
+        <div className="mt-8 text-center text-slate-400 text-sm font-medium">
+          Already have an account?{' '}
+          <Link href="/" className="text-indigo-400 font-black hover:text-white transition-all underline decoration-indigo-500/30 underline-offset-4">
+            Log In
+          </Link>
         </div>
       </div>
     </div>

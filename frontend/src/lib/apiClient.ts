@@ -2,7 +2,7 @@
 import axios, { AxiosInstance, AxiosError } from 'axios'
 import { useAuthStore } from '@/store/authStore'
 
-const API_URL = '/api'
+const API_URL = ''
 
 let apiClient: AxiosInstance
 

@@ -17,8 +17,8 @@ const outfit = Outfit({
 })
 
 export const metadata: Metadata = {
-  title: 'ONIT | Maintenance Redefined',
-  description: 'Track and schedule maintenance for your cars, houses, and appliances with precision.',
+  title: 'ONIT | Family Household Maintenance',
+  description: 'Easily track and schedule maintenance for your home, vehicles, and appliances.',
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',

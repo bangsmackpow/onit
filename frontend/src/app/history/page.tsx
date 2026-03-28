@@ -72,7 +72,7 @@ export default function HistoryPage() {
               Maintenance <span className="text-amber-500">History</span>
             </h1>
             <p className="text-slate-400 text-lg font-medium max-w-lg">
-              Immutable audit trail of all completed procedures and resource allocations.
+              A complete record of all completed household maintenance and spending.
             </p>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function HistoryPage() {
                 <DollarSign className="w-8 h-8" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Resource Overhead</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Total Spending</p>
                 <p className="text-3xl font-black text-white">${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
             </div>
@@ -99,7 +99,7 @@ export default function HistoryPage() {
                 <Layers className="w-8 h-8" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Ops Reconciled</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Tasks Completed</p>
                 <p className="text-3xl font-black text-white">{history.length}</p>
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function HistoryPage() {
                 <TrendingUp className="w-8 h-8" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">High Utilization</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Most Maintained</p>
                 <p className="text-2xl font-black text-white truncate max-w-[180px]">
                   {history.length > 0 ? (
                     (() => {
@@ -138,7 +138,7 @@ export default function HistoryPage() {
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
               <input 
                 type="text"
-                placeholder="Synchronize with audit records..."
+                placeholder="Search completed tasks..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="input-premium pl-16 py-4 bg-slate-950/30 font-medium"
@@ -147,12 +147,12 @@ export default function HistoryPage() {
             <div className="flex items-center gap-6 px-4">
               <div className="flex items-center gap-3">
                 <Filter className="w-4 h-4 text-indigo-500" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">Filtering: All Protocols</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">Viewing All Tasks</span>
               </div>
               <div className="w-[1px] h-4 bg-white/10" />
               <div className="flex items-center gap-3">
                 <Clock className="w-4 h-4 text-emerald-500" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">Chronological Array</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">Timeline View</span>
               </div>
             </div>
           </div>
@@ -161,11 +161,11 @@ export default function HistoryPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-950/20 text-slate-500 text-[9px] font-black uppercase tracking-[0.25em] border-b border-white/5">
-                  <th className="px-10 py-6">Operation & Target</th>
-                  <th className="px-10 py-6 text-center">Execution Timestamp</th>
-                  <th className="px-10 py-6">Allocations</th>
-                  <th className="px-10 py-6">Operator</th>
-                  <th className="px-10 py-6">Procedure Findings</th>
+                  <th className="px-10 py-6">Item & Task</th>
+                  <th className="px-10 py-6 text-center">Date Completed</th>
+                  <th className="px-10 py-6">Usage/Cost</th>
+                  <th className="px-10 py-6">Completed By</th>
+                  <th className="px-10 py-6">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -180,10 +180,10 @@ export default function HistoryPage() {
                     <td colSpan={5} className="px-10 py-32 text-center group">
                       <div className="glow-mesh" />
                       <HistoryIcon className="w-20 h-20 text-slate-800 mx-auto mb-8 transition-transform group-hover:scale-110 duration-500" />
-                      <h3 className="text-2xl font-black text-white mb-2">Zero Reconciliations Detected</h3>
-                      <p className="text-slate-500 font-medium mb-10 max-w-sm mx-auto uppercase tracking-widest text-[10px]">Verify initialization in the pending pipeline.</p>
+                      <h3 className="text-2xl font-black text-white mb-2">No History Found</h3>
+                      <p className="text-slate-500 font-medium mb-10 max-w-sm mx-auto uppercase tracking-widest text-[10px]">You haven't completed any tasks yet.</p>
                       <Link href="/tasks" className="btn-premium btn-premium-secondary inline-flex">
-                        Deploy Pipeline
+                        Go to Tasks
                         <ArrowRight className="w-4 h-4" />
                       </Link>
                     </td>
@@ -198,13 +198,13 @@ export default function HistoryPage() {
                           </div>
                           <div>
                             <p className="text-lg font-black text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight leading-tight">{h.task_name}</p>
-                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-1">Ref: {h.asset_name}</p>
+                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-1">{h.asset_name}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-10 py-8 text-center">
                         <p className="text-sm font-black text-white">{format(parseISO(h.completed_at), 'dd MMM yyyy')}</p>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">{format(parseISO(h.completed_at), 'hh:mm:ss')}</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">{format(parseISO(h.completed_at), 'hh:mm a')}</p>
                       </td>
                       <td className="px-10 py-8">
                         <div className="flex flex-wrap gap-3">
@@ -217,7 +217,7 @@ export default function HistoryPage() {
                           {h.mileage && (
                             <span className="inline-flex items-center px-4 py-1.5 bg-indigo-500/10 text-indigo-400 text-[10px] font-black rounded-full border border-indigo-500/20 shadow-sm">
                                <TrendingDown className="w-3 h-3 mr-1" />
-                               {h.mileage.toLocaleString()} KM
+                               {h.mileage.toLocaleString()}
                             </span>
                           )}
                           {!h.cost_usd && !h.mileage && <span className="text-slate-800 tracking-widest font-black">---</span>}
@@ -233,7 +233,7 @@ export default function HistoryPage() {
                       </td>
                       <td className="px-10 py-8 max-w-sm">
                         <p className="text-sm font-medium text-slate-500 italic line-clamp-2 leading-relaxed group-hover:text-slate-400 transition-colors">
-                          "{h.notes || 'End of log.'}"
+                          "{h.notes || 'No notes provided.'}"
                         </p>
                       </td>
                     </tr>
@@ -247,11 +247,11 @@ export default function HistoryPage() {
           <div className="p-4 bg-black/40 border-t border-white/5 flex items-center justify-center gap-10">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-500/40" />
-              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-600">Integrity Verified</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-600">Secure Record</span>
             </div>
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-indigo-500/40" />
-              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-600">Distributed Persistence</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-600">Cloud Synced</span>
             </div>
           </div>
         </div>

@@ -63,7 +63,7 @@ export default function LoginPage() {
             <h1 className="text-4xl font-black text-white tracking-tighter mb-3">
               ONIT<span className="text-indigo-500">.</span>
             </h1>
-            <p className="text-slate-400 font-medium text-sm tracking-wide">Enter your credentials to synchronize </p>
+            <p className="text-slate-400 font-medium text-sm tracking-wide">Sign in to manage your household</p>
           </div>
 
           {/* Error Message */}
@@ -79,7 +79,7 @@ export default function LoginPage() {
             {/* Email */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
-                Identity Profile
+                Email Address
               </label>
               <div className="relative group">
                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
@@ -88,7 +88,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@nexus.com"
+                  placeholder="name@example.com"
                   className="input-premium pl-14"
                   disabled={loading}
                 />
@@ -99,10 +99,10 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex justify-between items-center px-4">
                 <label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                  Access Key
+                  Password
                 </label>
                 <Link href="/forgot" className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 hover:text-indigo-300 transition-colors">
-                  Recovery
+                  Forgot?
                 </Link>
               </div>
               <div className="relative group">
@@ -128,11 +128,11 @@ export default function LoginPage() {
               {loading ? (
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Synchronizing...
+                  Signing In...
                 </div>
               ) : (
                 <>
-                  Establish Connection
+                  Sign In
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -142,11 +142,11 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="mt-12 pt-8 border-t border-white/5 text-center">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.1em]">
-              Unauthorized Access Prohibited
+              Family Dashboard Access
             </p>
             <div className="mt-4 flex items-center justify-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-500/50" />
-              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Secure Quantum Protocol Enabled</span>
+              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Secure Family Storage Enabled</span>
             </div>
           </div>
         </div>
@@ -154,9 +154,9 @@ export default function LoginPage() {
         {/* Bottom Link */}
         <div className="mt-8 text-center">
           <p className="text-slate-400 text-sm font-medium">
-            New operative?{' '}
+            New here?{' '}
             <Link href="/register" className="text-indigo-400 font-black hover:text-white transition-all underline decoration-indigo-500/30 underline-offset-4">
-              Initialize Account
+              Create New Account
             </Link>
           </p>
         </div>

@@ -79,10 +79,10 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
-              Maintenance <span className="text-indigo-500">Center</span>
+              Household <span className="text-indigo-500">Dashboard</span>
             </h1>
             <p className="text-slate-400 text-lg font-medium max-w-lg">
-              Optimizing the health of your assets through predictive scheduling.
+              Manage your home maintenance and track your family's tasks.
             </p>
           </div>
           <div className="flex gap-4">
@@ -91,14 +91,14 @@ export default function DashboardPage() {
               className="btn-premium btn-premium-primary"
             >
               <Plus className="w-5 h-5" />
-              Schedule Task
+              Add Task
             </Link>
             <Link 
               href="/assets/new" 
               className="btn-premium btn-premium-secondary"
             >
               <Zap className="w-5 h-5 text-indigo-400" />
-              New Asset
+              Add Item
             </Link>
           </div>
         </div>
@@ -127,7 +127,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between pl-2">
               <h2 className="text-2xl font-black text-white flex items-center gap-3">
                 <Calendar className="w-6 h-6 text-indigo-500" />
-                Next Procedures
+                Upcoming Tasks
               </h2>
               <Link href="/tasks" className="text-xs font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-300 flex items-center gap-2 group">
                 Full Schedule
@@ -143,14 +143,14 @@ export default function DashboardPage() {
               <div className="glass-card rounded-[3rem] p-16 text-center relative overflow-hidden group">
                 <div className="glow-mesh" />
                 <CheckCircle2 className="w-16 h-16 text-slate-800 mx-auto mb-6 transition-transform group-hover:scale-110 duration-500" />
-                <h3 className="text-2xl font-black text-white mb-2">Maximum Efficiency Reached</h3>
-                <p className="text-slate-400 mb-8 max-w-sm mx-auto font-medium">No pending maintenance tasks. Your entire ecosystem is currently at optimal performance levels.</p>
+                <h3 className="text-2xl font-black text-white mb-2">All Tasks Complete</h3>
+                <p className="text-slate-400 mb-8 max-w-sm mx-auto font-medium">Great job! All your household maintenance is up to date. Your home is running smoothly.</p>
                 <Link 
                   href="/tasks/new" 
                   className="btn-premium btn-premium-primary inline-flex"
                 >
                   <Plus className="w-5 h-5" />
-                  Configure Service Plan
+                  Add New Task
                 </Link>
               </div>
             ) : (
@@ -175,7 +175,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-6">
                         <div className="text-right hidden sm:block">
                           <p className={`text-[10px] font-black uppercase tracking-widest ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`}>
-                            {isOverdue ? 'Critical Delay' : 'Scheduled For'}
+                            {isOverdue ? 'Overdue' : 'Due On'}
                           </p>
                           <p className={`text-lg font-black ${isOverdue ? 'text-rose-400' : 'text-white'}`}>
                             {format(parseISO(task.next_due_date), 'MMM d, yyyy')}
@@ -194,19 +194,19 @@ export default function DashboardPage() {
 
           {/* Sidebar Area */}
           <div className="space-y-8">
-            <h2 className="text-xl font-black text-white pl-2">Intelligence</h2>
+            <h2 className="text-xl font-black text-white pl-2">Quick Actions</h2>
             <div className="glass-card p-8 rounded-[2.5rem] relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4">
                 <TrendingUp className="w-12 h-12 text-white/5" />
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-3">Service Templates</p>
-              <p className="text-slate-400 text-sm font-medium mb-8 leading-relaxed">Select specialized maintenance protocols to deploy instantly.</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-3">Common Tasks</p>
+              <p className="text-slate-400 text-sm font-medium mb-8 leading-relaxed">Quickly add common household maintenance tasks.</p>
               
               <div className="grid gap-4">
                 {[
-                  { name: 'HVAC Optimization', asset: 'Primary Residence', icon: '❄️' },
-                  { name: 'Power Unit Diagnostics', asset: 'Vehicle A', icon: '🛢️' },
-                  { name: 'Safety Grid Calibration', asset: 'General', icon: '🔔' },
+                  { name: 'A/C Filter Change', asset: 'Primary Residence', icon: '❄️' },
+                  { name: 'Oil Change', asset: 'Primary Vehicle', icon: '🛢️' },
+                  { name: 'Smoke Detector Test', asset: 'Household', icon: '🔔' },
                 ].map((tpl) => (
                   <button 
                     key={tpl.name}
@@ -223,23 +223,23 @@ export default function DashboardPage() {
                 ))}
               </div>
 
-              <Link href="/templates" className="mt-8 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white flex items-center justify-center gap-2 transition-colors">
-                Explore Protocol Library
+              <Link href="/tasks/new" className="mt-8 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white flex items-center justify-center gap-2 transition-colors">
+                View All Templates
                 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
 
             {/* Pro Tips */}
-            <div className="relative group overflow-hidden rounded-[2.5rem] p-8 bg-gradient-to-br from-indigo-600 to-indigo-800 shadow-2xl shadow-indigo-500/20">
+            <div className="relative group overflow-hidden rounded-[2.5rem] p-8 bg-gradient-to-br from-indigo-600 to-indigo-800 shadow-2xl shadow-indigo-600/20">
               <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-[60px]" />
               <ShieldCheck className="w-12 h-12 text-white mb-6" />
-              <h3 className="text-2xl font-black text-white mb-2 leading-tight">Asset Longevity</h3>
+              <h3 className="text-2xl font-black text-white mb-2 leading-tight">Home Maintenance</h3>
               <p className="text-indigo-100/80 text-sm font-medium mb-8 leading-relaxed">
-                Strategic maintenance cycles have been proven to enhance hardware lifecycle by up to <span className="text-white font-black underline decoration-indigo-300">32%</span>.
+                Regular maintenance can extend the life of your appliances and vehicles by years.
               </p>
-              <button className="w-full py-4 bg-white text-indigo-900 font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all shadow-lg active:scale-95">
-                Analyze Performance
-              </button>
+              <Link href="/history" className="w-full inline-block text-center py-4 bg-white text-indigo-900 font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all shadow-lg active:scale-95">
+                View History
+              </Link>
             </div>
           </div>
         </div>

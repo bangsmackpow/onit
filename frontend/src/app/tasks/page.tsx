@@ -89,10 +89,10 @@ export default function TasksPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
-              Maintenance <span className="text-indigo-500">Pipeline</span>
+              Maintenance <span className="text-indigo-500">Tasks</span>
             </h1>
             <p className="text-slate-400 text-lg font-medium max-w-lg">
-              Manage and execute scheduled maintenance protocols across your assets.
+              Track and complete upcoming maintenance for your home and vehicles.
             </p>
           </div>
           <Link 
@@ -100,7 +100,7 @@ export default function TasksPage() {
             className="btn-premium btn-premium-primary"
           >
             <Plus className="w-5 h-5" />
-            Schedule Protocol
+            Add New Task
           </Link>
         </div>
 
@@ -110,13 +110,13 @@ export default function TasksPage() {
             onClick={() => setFilter('all')}
             className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'all' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
           >
-            All Ops
+            All Tasks
           </button>
           <button 
             onClick={() => setFilter('overdue')}
             className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'overdue' ? 'bg-rose-500/10 text-rose-400 shadow-sm border border-rose-500/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
           >
-            Critical Delay
+            Overdue
           </button>
           <button 
             onClick={() => setFilter('upcoming')}
@@ -137,9 +137,9 @@ export default function TasksPage() {
             <div className="w-24 h-24 bg-slate-950 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-500">
               <CheckCircle2 className="w-10 h-10 text-slate-600" />
             </div>
-            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Pipeline Clear</h3>
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">All Done!</h3>
             <p className="text-slate-400 mb-10 max-w-sm mx-auto font-medium">
-              {filter === 'all' ? 'All scheduled maintenance operations have been reconciled. System is at high performance.' : `No pending items detected for the '${filter}' filter criteria.`}
+              {filter === 'all' ? 'All maintenance tasks are complete. Your home is running smoothly!' : `No pending items found for the '${filter}' filter.`}
             </p>
           </div>
         ) : (
@@ -180,7 +180,7 @@ export default function TasksPage() {
 
                   <div className="flex items-center gap-8">
                     <div className="text-right flex-shrink-0">
-                      <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`}>Target Date</p>
+                      <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`}>Due Date</p>
                       <p className={`text-xl font-black ${isOverdue ? 'text-rose-400' : 'text-white'}`}>
                         {format(parseISO(task.next_due_date), 'MMM d, yyyy')}
                       </p>
@@ -191,7 +191,7 @@ export default function TasksPage() {
                       className="btn-premium btn-premium-secondary group/btn border-indigo-500/30"
                     >
                       <CheckCircle2 className="w-5 h-5 text-indigo-500 group-hover/btn:text-white" />
-                      Reconcile
+                      Complete
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -216,8 +216,8 @@ export default function TasksPage() {
                     <ShieldCheck className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight">Reconciliation</h2>
-                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Protocol Execution Record</p>
+                    <h2 className="text-3xl font-black text-white tracking-tight">Task Completion</h2>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Record Household Maintenance</p>
                   </div>
                 </div>
                 <button onClick={() => setCompletingTaskId(null)} className="p-3 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl transition-all">
@@ -229,12 +229,12 @@ export default function TasksPage() {
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
                     <Zap className="w-3 h-3" />
-                    Operation Notes
+                    Completion Notes
                   </label>
                   <textarea 
                     value={completionData.notes}
                     onChange={(e) => setCompletionData({...completionData, notes: e.target.value})}
-                    placeholder="Document the maintenance procedure findings..."
+                    placeholder="What was done? (e.g., changed oil, replaced filter...)"
                     className="input-premium py-5 px-6"
                     rows={4}
                   />
@@ -260,7 +260,7 @@ export default function TasksPage() {
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
                       <DollarSign className="w-3 h-3" />
-                      Resource Allocation
+                      Cost
                     </label>
                     <div className="relative group/input">
                       <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-indigo-400 transition-colors" />
@@ -281,7 +281,7 @@ export default function TasksPage() {
                     type="submit"
                     className="btn-premium btn-premium-primary w-full h-[72px] text-lg shadow-2xl group/sub"
                   >
-                    Confirm Reconciliation
+                    Save Completion
                     <ArrowRight className="w-6 h-6 group-hover/sub:translate-x-1 transition-transform" />
                   </button>
                 </div>

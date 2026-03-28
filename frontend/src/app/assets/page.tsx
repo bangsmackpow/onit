@@ -85,10 +85,10 @@ export default function AssetsPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
-              Inventory <span className="text-emerald-500">Assets</span>
+              Household <span className="text-emerald-500">Assets</span>
             </h1>
             <p className="text-slate-400 text-lg font-medium max-w-lg">
-              Catalog and track your physical hardware and infrastructures.
+              Keep track of your cars, appliances, and home systems.
             </p>
           </div>
           <Link 
@@ -96,7 +96,7 @@ export default function AssetsPage() {
             className="btn-premium btn-premium-primary"
           >
             <Plus className="w-5 h-5" />
-            Initialize Asset
+            Add Asset
           </Link>
         </div>
 
@@ -117,7 +117,7 @@ export default function AssetsPage() {
             <div className="flex items-center gap-3">
               <LayoutGrid className="w-4 h-4 text-slate-500" />
               <p className="text-xs font-black uppercase tracking-widest text-slate-400">
-                <span className="text-white">{assets.length}</span> Objects
+                <span className="text-white">{assets.length}</span> Items
               </p>
             </div>
             <div className="w-[1px] h-4 bg-white/10" />
@@ -141,16 +141,16 @@ export default function AssetsPage() {
             <div className="w-24 h-24 bg-slate-950 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-500">
               <Plus className="w-10 h-10 text-slate-600" />
             </div>
-            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Zero Assets Registered</h3>
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">No Assets Found</h3>
             <p className="text-slate-400 mb-10 max-w-sm mx-auto font-medium">
-              Start by initializing your first car, house, or appliance unit to begin monitoring operations.
+              Add your first car, house, or appliance unit to start tracking maintenance.
             </p>
             <Link 
               href="/assets/new" 
               className="btn-premium btn-premium-primary inline-flex"
             >
               <Plus className="w-5 h-5" />
-              Begin Initialization
+              Add Your First Item
             </Link>
           </div>
         ) : (
@@ -170,7 +170,7 @@ export default function AssetsPage() {
                     <button 
                       onClick={() => handleDelete(asset.id)}
                       className="p-3 text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl border border-transparent hover:border-rose-500/20 transition-all"
-                      title="Decommission Asset"
+                      title="Delete Asset"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -183,10 +183,6 @@ export default function AssetsPage() {
                     <p className="text-[10px] font-black uppercase tracking-widest py-1 px-3 bg-white/5 rounded-full border border-white/5 text-slate-400">
                       {asset.asset_type}
                     </p>
-                    <span className="text-slate-700">•</span>
-                    <p className="text-[10px] font-black uppercase tracking-widest">
-                      ID: {asset.id.slice(0, 8)}
-                    </p>
                   </div>
                   
                   {asset.description && (
@@ -196,12 +192,12 @@ export default function AssetsPage() {
                   )}
                 </div>
 
-                <div className="p-4 bg-white/[0.02] border-t border-white/5 group-hover:bg-indigo-500 transition-all">
+                <div className="p-4 bg-white/[0.02] border-t border-white/5 group-hover:bg-indigo-600 transition-all">
                   <Link 
                     href={`/assets/${asset.id}`} 
                     className="flex items-center justify-between px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-300 group-hover:text-white"
                   >
-                    View Unit State
+                    View Item Details
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
