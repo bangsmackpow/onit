@@ -23,6 +23,7 @@ interface AuthStore {
   logout: () => void
   setToken: (token: string) => void
   loadFromLocalStorage: () => void
+  refreshUser: () => Promise<void>
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
@@ -96,6 +97,28 @@ export const useAuthStore = create<AuthStore>((set) => ({
     if (token && userJson) {
       const user = JSON.parse(userJson)
       set({ token, user })
+    }
+  },
+
+  refreshUser: async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+    if (!token) return
+
+    try {
+      const response = await axios.get(`${API_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const { user } = response.data
+      localStorage.setItem('user', JSON.stringify(user))
+      set({ user })
+    } catch (error) {
+      console.error('Failed to refresh user', error)
+      // If unauthorized, logout
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        set({ token: null, user: null })
+      }
     }
   },
 }))

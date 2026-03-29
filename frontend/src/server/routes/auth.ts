@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
 import * as bcrypt from 'bcryptjs'
-import { generateJWT } from '../middleware/auth'
+import { generateJWT, authMiddleware } from '../middleware/auth'
 import { Env, Variables } from '../types'
 
 const auth = new Hono<{ Bindings: Env, Variables: Variables }>()
@@ -137,6 +137,49 @@ auth.post('/register', async (c) => {
 // ============================================================================
 // LOGIN
 // ============================================================================
+// ============================================================================
+// GET CURRENT USER (ME)
+// ============================================================================
+auth.get('/me', authMiddleware, async (c) => {
+  try {
+    const userId = c.get('userId') as string
+    const db = c.env.DB
+
+    const res = await db.prepare(`
+      SELECT u.id, u.tenant_id, u.email, u.full_name, u.is_owner, t.plan 
+      FROM users u 
+      JOIN tenants t ON u.tenant_id = t.id 
+      WHERE u.id = ?
+    `).bind(userId).first<{
+      id: string
+      tenant_id: string
+      email: string
+      full_name: string
+      is_owner: number
+      plan: string
+    }>()
+
+    if (!res) {
+      return c.json({ error: 'User not found' }, 404)
+    }
+
+    return c.json({
+      user: {
+        id: res.id,
+        tenantId: res.tenant_id,
+        email: res.email,
+        fullName: res.full_name,
+        isOwner: !!res.is_owner,
+        plan: res.plan?.toLowerCase().trim() || 'free',
+        isAdmin: res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
+      },
+    })
+  } catch (error) {
+    console.error('Me error:', error)
+    return c.json({ error: 'Failed to fetch user context' }, 500)
+  }
+})
+
 auth.post('/login', async (c) => {
   try {
     const body = await c.req.json()

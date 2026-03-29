@@ -30,11 +30,12 @@ interface Props {
 export default function DashboardLayout({ children }: Props) {
   const router = useRouter()
   const pathname = usePathname()
-  const { user, logout, loadFromLocalStorage } = useAuthStore()
+  const { user, logout, loadFromLocalStorage, refreshUser } = useAuthStore()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   useEffect(() => {
     loadFromLocalStorage()
+    refreshUser()
   }, [])
 
   useEffect(() => {
