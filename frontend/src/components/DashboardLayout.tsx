@@ -18,7 +18,8 @@ import {
   Search,
   Users,
   Star,
-  Zap
+  Zap,
+  Shield
 } from 'lucide-react'
 import MobileNav from './MobileNav'
 
@@ -107,7 +108,21 @@ export default function DashboardLayout({ children }: Props) {
               </nav>
             </div>
             
-            {/* Secondary Section could go here */}
+            {user.isAdmin && (
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-4 ml-4">System</p>
+                <nav className="space-y-1">
+                  <Link
+                    href="/dashboard/admin"
+                    className={`nav-item ${pathname === '/dashboard/admin' ? 'bg-rose-500/10 text-white' : 'text-slate-400 hover:bg-rose-500/5 hover:text-rose-400'}`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <Shield className={`mr-3 h-5 w-5 transition-colors ${pathname === '/dashboard/admin' ? 'text-rose-400' : 'text-slate-500'}`} />
+                    Admin Console
+                  </Link>
+                </nav>
+              </div>
+            )}
           </div>
 
           {/* User Section */}

@@ -12,6 +12,7 @@ import remindersRoutes from './routes/reminders'
 import invitationsRoutes from './routes/invitations'
 import mediaRoutes from './routes/media'
 import billingRoutes from './routes/billing'
+import adminRoutes from './routes/admin'
 import cronHandler from './services/cron'
 import { authMiddleware } from './middleware/auth'
 import { Env, Variables } from './types'
@@ -57,6 +58,20 @@ app.use('/api/invitations/*', authMiddleware)
 app.use('/api/media/*', authMiddleware)
 app.use('/api/billing/create-checkout-session', authMiddleware)
 
+// Admin Middleware: Strict restriction by email
+const adminMiddleware = async (c: any, next: any) => {
+  await authMiddleware(c, async () => {}) // Ensure authenticated first
+  const userEmail = c.get('email')
+  const allowedEmail = c.env.ADMIN_EMAIL || 'curtis@example.com' // Fallback for dev if not set
+  
+  if (userEmail !== allowedEmail) {
+    return c.json({ error: 'Forbidden: Admin access only' }, 403)
+  }
+  await next()
+}
+
+app.use('/api/admin/*', adminMiddleware)
+
 app.route('/api/assets', assetsRoutes)
 app.route('/api/tasks', tasksRoutes)
 app.route('/api/history', historyRoutes)
@@ -64,6 +79,7 @@ app.route('/api/reminders', remindersRoutes)
 app.route('/api/invitations', invitationsRoutes)
 app.route('/api/media', mediaRoutes)
 app.route('/api/billing', billingRoutes)
+app.route('/api/admin', adminRoutes)
 
 // ============================================================================
 // CRON TRIGGERS (Cloudflare Cron)

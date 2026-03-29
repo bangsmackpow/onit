@@ -7,6 +7,7 @@ export interface Env {
   SMTP_FROM_EMAIL: string
   STRIPE_SECRET_KEY: string
   STRIPE_WEBHOOK_SECRET: string
+  ADMIN_EMAIL: string
 }
 
 export interface Variables {

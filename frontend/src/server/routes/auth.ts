@@ -116,7 +116,8 @@ auth.post('/register', async (c) => {
           email: validated.email,
           fullName: validated.fullName,
           isOwner: true,
-          plan
+          plan,
+          isAdmin: validated.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
         },
         message: 'Registration successful',
       }, 201)
@@ -173,7 +174,8 @@ auth.post('/login', async (c) => {
         email: res.email,
         fullName: res.full_name,
         isOwner: !!res.is_owner,
-        plan: res.plan
+        plan: res.plan,
+        isAdmin: res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
       },
     })
 

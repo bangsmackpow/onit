@@ -8,6 +8,7 @@ interface User {
   email: string
   fullName: string
   plan: 'free' | 'premium'
+  isAdmin: boolean
 }
 
 interface AuthStore {
