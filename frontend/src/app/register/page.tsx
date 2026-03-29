@@ -1,14 +1,13 @@
 // frontend/src/app/register/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
 import { Mail, Lock, User, Building, AlertCircle, ArrowRight, ShieldCheck, UserPlus } from 'lucide-react'
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const inviteToken = searchParams.get('token')
@@ -217,5 +216,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin"></div>
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
   )
 }
