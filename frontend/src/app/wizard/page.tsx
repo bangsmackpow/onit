@@ -25,8 +25,8 @@ interface AssetOption {
   id: string
   name: string
   icon: React.ReactNode
-  category: 'home' | 'vehicle' | 'appliance'
-  defaultTasks: { name: string; frequency: string; description: string }[]
+  category: 'house' | 'car' | 'appliance'
+  defaultTasks: { name: string; frequency: 'monthly' | 'quarterly' | 'annual' | 'biannual'; description: string }[]
 }
 
 const ASSET_OPTIONS: AssetOption[] = [
@@ -34,19 +34,19 @@ const ASSET_OPTIONS: AssetOption[] = [
     id: 'hvac',
     name: 'HVAC / AC System',
     icon: <Thermometer className="w-5 h-5" />,
-    category: 'home',
+    category: 'house',
     defaultTasks: [
-      { name: 'Change Air Filter', frequency: '90 days', description: 'Replace the main HVAC return air filter.' },
-      { name: 'Annual Inspection', frequency: '1 year', description: 'Schedule professional maintenance.' }
+      { name: 'Change Air Filter', frequency: 'quarterly', description: 'Replace the main HVAC return air filter.' },
+      { name: 'Annual Inspection', frequency: 'annual', description: 'Schedule professional maintenance.' }
     ]
   },
   {
     id: 'water_heater',
     name: 'Water Heater',
     icon: <Droplets className="w-5 h-5" />,
-    category: 'home',
+    category: 'house',
     defaultTasks: [
-      { name: 'Flush Tank', frequency: '1 year', description: 'Remove sediment buildup from the tank.' }
+      { name: 'Flush Tank', frequency: 'annual', description: 'Remove sediment buildup from the tank.' }
     ]
   },
   {
@@ -55,33 +55,33 @@ const ASSET_OPTIONS: AssetOption[] = [
     icon: <Waves className="w-5 h-5" />,
     category: 'appliance',
     defaultTasks: [
-      { name: 'Clean Drum', frequency: '60 days', description: 'Run a cleaning cycle with vinegar or cleaner.' }
+      { name: 'Clean Drum', frequency: 'monthly', description: 'Run a cleaning cycle.' }
     ]
   },
   {
     id: 'car_main',
     name: 'Primary Vehicle',
     icon: <Car className="w-5 h-5" />,
-    category: 'vehicle',
+    category: 'car',
     defaultTasks: [
-      { name: 'Oil Change', frequency: '180 days', description: 'Check and replace engine oil.' },
-      { name: 'Tire Rotation', frequency: '180 days', description: 'Rotate tires to ensure even wear.' }
+      { name: 'Oil Change', frequency: 'biannual', description: 'Check and replace engine oil.' },
+      { name: 'Tire Rotation', frequency: 'biannual', description: 'Rotate tires to ensure even wear.' }
     ]
   },
   {
     id: 'roof',
     name: 'Roof & Gutters',
     icon: <ShieldCheck className="w-5 h-5" />,
-    category: 'home',
+    category: 'house',
     defaultTasks: [
-      { name: 'Clean Gutters', frequency: '180 days', description: 'Remove leaves and debris.' }
+      { name: 'Clean Gutters', frequency: 'biannual', description: 'Remove leaves and debris.' }
     ]
   }
 ]
 
 export default function OnboardingWizard() {
   const router = useRouter()
-  const { token } = useAuthStore()
+  const { token, user } = useAuthStore()
   const [step, setStep] = useState<WizardStep>(1)
   const [selectedAssets, setSelectedAssets] = useState<string[]>([])
   const [propertyType, setPropertyType] = useState<string>('')
@@ -127,21 +127,22 @@ export default function OnboardingWizard() {
 
         const assetResponse = await apiPost('/api/assets', {
           name: option.name,
-          type: option.category,
-          status: 'active',
-          metadata: { onboarded: true, propertyType }
+          assetType: option.category,
+          description: `Onboarded ${option.name} for ${propertyType}`
         })
 
-        const createdAsset = assetResponse.data
+        const createdAsset = assetResponse.data.asset
         
         // Add default tasks
         for (const task of option.defaultTasks) {
           await apiPost('/api/tasks', {
             assetId: createdAsset.id,
-            name: task.name,
-            frequency: task.frequency,
+            taskName: task.name,
             description: task.description,
-            status: 'pending'
+            assignmentType: 'single',
+            assignedToUserIds: [user?.id],
+            recurrenceType: task.frequency,
+            nextDueDate: new Date().toISOString()
           })
         }
       }
