@@ -35,6 +35,19 @@ app.get('/api/health', (c) => {
   return c.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+// DB connectivity check
+app.get('/api/db-health', async (c) => {
+  try {
+    const db = c.env.DB
+    if (!db) return c.json({ status: 'error', error: 'D1 binding (DB) is missing in environment' }, 500)
+    
+    const result = await db.prepare('SELECT 1').run()
+    return c.json({ status: 'ok', db: 'reachable', result })
+  } catch (error) {
+    return c.json({ status: 'error', error: String(error) }, 500)
+  }
+})
+
 // ============================================================================
 // PUBLIC ROUTES (no auth required)
 // ============================================================================
