@@ -7,6 +7,7 @@ interface User {
   tenantId: string
   email: string
   fullName: string
+  plan: 'free' | 'premium'
 }
 
 interface AuthStore {

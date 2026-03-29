@@ -10,20 +10,18 @@ import {
   CheckCircle2, 
   Clock, 
   FileText, 
-  History, 
   Image as ImageIcon, 
-  MoreVertical, 
-  Plus, 
   Settings, 
   Trash2, 
   Upload,
   ExternalLink,
-  Download,
   AlertCircle,
   Car,
   Home,
-  Zap
+  Zap,
+  ChevronRight
 } from 'lucide-react'
+import { clsx } from 'clsx'
 import { format, parseISO } from 'date-fns'
 import Link from 'next/link'
 
@@ -37,6 +35,7 @@ interface Asset {
 
 interface Task {
   id: string
+  asset_id: string
   task_name: string
   next_due_date: string
   recurrence_type: string
@@ -60,17 +59,18 @@ export default function AssetDetailsPage() {
   const [media, setMedia] = useState<Media[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchData()
+    if (id) {
+      fetchData()
+    }
   }, [id])
 
   async function fetchData() {
     try {
       const [assetRes, tasksRes, mediaRes] = await Promise.all([
         apiGet(`/api/assets/${id}`),
-        apiGet(`/api/tasks`), // We'll filter this in frontend for now
+        apiGet(`/api/tasks`),
         apiGet(`/api/media/asset/${id}`)
       ])
       
@@ -81,7 +81,6 @@ export default function AssetDetailsPage() {
       setMedia(mediaRes.data.media || [])
     } catch (err) {
       console.error('Failed to fetch asset details', err)
-      setError('Could not load asset details.')
     } finally {
       setLoading(false)
     }
@@ -109,6 +108,16 @@ export default function AssetDetailsPage() {
     }
   }
 
+  const handleDeleteAsset = async () => {
+    if (!confirm('Are you sure you want to delete this asset?')) return
+    try {
+      await apiDelete(`/api/assets/${id}`)
+      router.push('/assets')
+    } catch (err) {
+      console.error('Delete failed', err)
+    }
+  }
+
   const getTypeIcon = (type?: string) => {
     switch (type) {
       case 'car': return <Car className="w-8 h-8" />
@@ -132,10 +141,6 @@ export default function AssetDetailsPage() {
       <div className="max-w-7xl mx-auto space-y-8 animate-pulse p-8">
         <div className="h-8 bg-white/5 w-48 rounded" />
         <div className="h-64 bg-white/5 rounded-[3rem]" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="h-96 bg-white/5 rounded-[3rem]" />
-          <div className="h-96 bg-white/5 rounded-[3rem]" />
-        </div>
       </div>
     </DashboardLayout>
   )
@@ -167,10 +172,10 @@ export default function AssetDetailsPage() {
             Back to Household
           </Link>
           <div className="flex items-center gap-2">
-            <button className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-slate-400 hover:text-white transition-all border border-white/5">
-              <Settings className="w-5 h-5" />
-            </button>
-            <button className="p-3 bg-rose-500/10 hover:bg-rose-500/20 rounded-2xl text-rose-400 transition-all border border-rose-500/10">
+            <button 
+              onClick={handleDeleteAsset}
+              className="p-3 bg-rose-500/10 hover:bg-rose-500/20 rounded-2xl text-rose-400 transition-all border border-rose-500/10"
+            >
               <Trash2 className="w-5 h-5" />
             </button>
           </div>
@@ -212,9 +217,6 @@ export default function AssetDetailsPage() {
                 <CheckCircle2 className="w-6 h-6 text-indigo-500" />
                 Maintenance Schedule
               </h2>
-              <button className="text-xs font-black uppercase tracking-widest text-indigo-400 hover:text-white transition-colors">
-                Add Task
-              </button>
             </div>
             
             <div className="space-y-4">
@@ -240,9 +242,7 @@ export default function AssetDetailsPage() {
                       </div>
                     </div>
                   </div>
-                  <button className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center text-slate-600 hover:text-indigo-400 hover:border-indigo-500/30 transition-all">
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <ChevronRight className="w-4 h-4 text-slate-600" />
                 </div>
               ))}
             </div>
@@ -295,16 +295,14 @@ export default function AssetDetailsPage() {
                       <p className="text-[10px] text-white font-black uppercase tracking-tight truncate max-w-[100px]">
                         {item.file_name}
                       </p>
-                      <div className="flex gap-1">
-                        <a 
-                          href={item.url} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="p-2 transition-colors hover:text-emerald-400"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </div>
+                      <a 
+                        href={item.url} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="p-2 transition-colors hover:text-emerald-400"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
                     </div>
                   </div>
                 </div>

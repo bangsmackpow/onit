@@ -11,6 +11,7 @@ import historyRoutes from './routes/history'
 import remindersRoutes from './routes/reminders'
 import invitationsRoutes from './routes/invitations'
 import mediaRoutes from './routes/media'
+import billingRoutes from './routes/billing'
 import cronHandler from './services/cron'
 import { authMiddleware } from './middleware/auth'
 import { Env, Variables } from './types'
@@ -54,6 +55,7 @@ app.use('/api/history/*', authMiddleware)
 app.use('/api/reminders/*', authMiddleware)
 app.use('/api/invitations/*', authMiddleware)
 app.use('/api/media/*', authMiddleware)
+app.use('/api/billing/create-checkout-session', authMiddleware)
 
 app.route('/api/assets', assetsRoutes)
 app.route('/api/tasks', tasksRoutes)
@@ -61,6 +63,7 @@ app.route('/api/history', historyRoutes)
 app.route('/api/reminders', remindersRoutes)
 app.route('/api/invitations', invitationsRoutes)
 app.route('/api/media', mediaRoutes)
+app.route('/api/billing', billingRoutes)
 
 // ============================================================================
 // CRON TRIGGERS (Cloudflare Cron)

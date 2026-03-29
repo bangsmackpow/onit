@@ -13,10 +13,13 @@ import {
   CheckCircle2,
   AlertCircle,
   Copy,
-  ExternalLink
+  Zap,
+  Star,
+  Sparkles
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { format, parseISO } from 'date-fns'
+import { useAuthStore } from '@/store/authStore'
 
 interface UserMember {
   id: string
@@ -37,12 +40,14 @@ interface Invitation {
 }
 
 export default function FamilyPage() {
+  const { user } = useAuthStore()
   const [members, setMembers] = useState<UserMember[]>([])
   const [invites, setInvites] = useState<Invitation[]>([])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<'admin' | 'member'>('member')
   const [loading, setLoading] = useState(true)
   const [isInviting, setIsInviting] = useState(false)
+  const [isUpgrading, setIsUpgrading] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null)
 
   useEffect(() => {
@@ -52,7 +57,7 @@ export default function FamilyPage() {
   async function fetchData() {
     try {
       const [membersRes, invitesRes] = await Promise.all([
-        apiGet('/api/auth/members'), // We need to implement this endpoint
+        apiGet('/api/auth/members'),
         apiGet('/api/invitations')
       ])
       setMembers(membersRes.data.members || [])
@@ -97,6 +102,19 @@ export default function FamilyPage() {
     }
   }
 
+  const handleUpgrade = async () => {
+    setIsUpgrading(true)
+    try {
+      const res = await apiPost('/api/billing/create-checkout-session')
+      window.location.href = res.data.url
+    } catch (err) {
+      console.error('Upgrade failed', err)
+      alert('Failed to start checkout. Please try again.')
+    } finally {
+      setIsUpgrading(false)
+    }
+  }
+
   const copyInviteLink = (token: string) => {
     const link = `${window.location.origin}/register?token=${token}`
     navigator.clipboard.writeText(link)
@@ -106,17 +124,77 @@ export default function FamilyPage() {
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-10 pb-24">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-black text-white tracking-tight flex items-center gap-4">
-            <Users className="w-10 h-10 text-indigo-500" />
-            Family <span className="text-indigo-500">& Members</span>
-          </h1>
-          <p className="text-slate-400 text-lg">Manage who has access to your household maintenance schedule.</p>
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-black text-white tracking-tight flex items-center gap-4">
+              <Users className="w-10 h-10 text-indigo-500" />
+              Family <span className="text-indigo-500">& Members</span>
+            </h1>
+            <p className="text-slate-400 text-lg">Manage who has access to your household maintenance schedule.</p>
+          </div>
+          
+          {user?.plan === 'premium' ? (
+            <div className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
+              <Star className="w-4 h-4 text-indigo-400 fill-indigo-400" />
+              <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Premium Household</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-white/5 rounded-full">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Free Account</span>
+            </div>
+          )}
         </div>
 
-        {/* Invite Form */}
-        <div className="glass-card p-8 rounded-[2.5rem] relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        {/* Premium Upgrade CTA */}
+        {user?.plan !== 'premium' && (
+          <div className="relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 bg-gradient-to-br from-indigo-600 to-violet-700 shadow-2xl shadow-indigo-500/20">
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+              <Sparkles className="w-32 h-32 text-white" />
+            </div>
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/20">
+                  <Zap className="w-3 h-3 text-white fill-white" />
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Upgrade to Premium</span>
+                </div>
+                <h2 className="text-3xl font-black text-white leading-tight">Unlock Family Sharing</h2>
+                <p className="text-indigo-100 font-medium max-w-md">
+                  Invite your spouse, roommates, or family members to collaborate on tasks and share household assets.
+                </p>
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-white/80">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Multi-user Collaboration
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-white/80">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Document & Media Storage
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={handleUpgrade}
+                disabled={isUpgrading}
+                className="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-indigo-50 hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50"
+              >
+                {isUpgrading ? 'Loading...' : 'Go Premium — $4.99/mo'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Invite Form (Locked for Free users) */}
+        <div className={clsx(
+          "glass-card p-8 rounded-[2.5rem] relative overflow-hidden group transition-opacity",
+          user?.plan !== 'premium' && "opacity-50"
+        )}>
+           {user?.plan !== 'premium' && (
+            <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center p-8 text-center">
+              <Shield className="w-12 h-12 text-indigo-400 mb-4 opacity-50" />
+              <p className="text-white font-bold max-w-[200px]">Unlock Invitations with Premium</p>
+            </div>
+          )}
+          
+          <div className="absolute top-0 right-0 p-4 opacity-10">
             <UserPlus className="w-16 h-16 text-white" />
           </div>
           <h2 className="text-xl font-black text-white mb-6">Invite Someone</h2>
@@ -131,12 +209,14 @@ export default function FamilyPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   required
+                  disabled={user?.plan !== 'premium'}
                   className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500/50 transition-all font-medium"
                 />
               </div>
               <select
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value as any)}
+                disabled={user?.plan !== 'premium'}
                 className="bg-slate-900/50 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-indigo-500/50 transition-all font-medium"
               >
                 <option value="member">Member (View/Edit)</option>
@@ -144,7 +224,7 @@ export default function FamilyPage() {
               </select>
               <button
                 type="submit"
-                disabled={isInviting}
+                disabled={isInviting || user?.plan !== 'premium'}
                 className="btn-premium btn-premium-primary px-8 py-4 disabled:opacity-50"
               >
                 {isInviting ? 'Sending...' : 'Send Invite'}

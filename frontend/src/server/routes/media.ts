@@ -10,7 +10,7 @@ const media = new Hono<{ Bindings: Env, Variables: Variables }>()
 // ============================================================================
 media.post('/upload', async (c) => {
   try {
-    const tenantId = c.get('tenantId')
+    const tenantId = c.get('tenantId') as string
     const body = await c.req.parseBody()
     const file = body['file'] as File
     const assetId = body['assetId'] as string
@@ -21,6 +21,12 @@ media.post('/upload', async (c) => {
 
     if (!assetId) {
       return c.json({ error: 'assetId is required' }, 400)
+    }
+
+    // Check plan
+    const tenant = await c.env.DB.prepare('SELECT plan FROM tenants WHERE id = ?').bind(tenantId).first<{ plan: string }>()
+    if (tenant?.plan !== 'premium') {
+      return c.json({ error: 'Upgrade to Premium to upload photos and documents.' }, 403)
     }
 
     const fileId = nanoid()

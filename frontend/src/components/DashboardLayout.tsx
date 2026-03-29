@@ -3,6 +3,7 @@
 
 import { ReactNode, useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { clsx } from 'clsx'
 import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
 import { 
@@ -15,7 +16,9 @@ import {
   X,
   Bell,
   Search,
-  Users
+  Users,
+  Star,
+  Zap
 } from 'lucide-react'
 import MobileNav from './MobileNav'
 
@@ -110,14 +113,32 @@ export default function DashboardLayout({ children }: Props) {
           {/* User Section */}
           <div className="pt-6 border-t border-white/5 mx-[-1.5rem] px-6">
             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/5 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center text-white font-black shadow-lg">
-                {user.fullName.charAt(0)}
+              <div className={clsx(
+                "w-10 h-10 rounded-xl flex items-center justify-center text-white font-black shadow-lg",
+                user.plan === 'premium' ? "bg-gradient-to-br from-indigo-500 to-indigo-700" : "bg-slate-700"
+              )}>
+                {user.plan === 'premium' ? <Star className="w-5 h-5 fill-white" /> : user.fullName.charAt(0)}
               </div>
               <div className="overflow-hidden">
                 <p className="text-xs font-bold text-white truncate">{user.fullName}</p>
-                <p className="text-[10px] text-indigo-400/80 truncate font-medium">Premium Member</p>
+                <p className={clsx(
+                  "text-[10px] truncate font-black uppercase tracking-widest mt-0.5",
+                  user.plan === 'premium' ? "text-indigo-400" : "text-slate-500"
+                )}>
+                  {user.plan === 'premium' ? 'Premium Plan' : 'Free Account'}
+                </p>
               </div>
             </div>
+            
+            {user.plan !== 'premium' && (
+              <Link 
+                href="/dashboard/family" 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 transition-all mb-4 group"
+              >
+                <Zap className="w-4 h-4 fill-indigo-400 group-hover:scale-125 transition-transform" />
+                <span className="text-xs font-black uppercase tracking-widest">Upgrade Now</span>
+              </Link>
+            )}
             <button
               onClick={logout}
               className="w-full flex items-center justify-center px-4 py-3 text-sm font-bold text-slate-400 rounded-xl hover:bg-red-500/10 hover:text-red-400 transition-all border border-transparent hover:border-red-500/20"

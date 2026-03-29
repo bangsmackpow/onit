@@ -5,6 +5,8 @@ export interface Env {
   MEDIA: R2Bucket
   SMTP2GO_API_KEY: string
   SMTP_FROM_EMAIL: string
+  STRIPE_SECRET_KEY: string
+  STRIPE_WEBHOOK_SECRET: string
 }
 
 export interface Variables {

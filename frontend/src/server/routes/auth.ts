@@ -64,14 +64,18 @@ auth.post('/register', async (c) => {
     // Transaction for registration
     await db.prepare('BEGIN TRANSACTION').run()
     try {
+      let plan = 'free'
       if (!tenantIdByInvite) {
         // Create new tenant if not joining one
         await db
           .prepare(
             'INSERT INTO tenants (id, name, plan, created_at, updated_at) VALUES (?, ?, ?, datetime("now"), datetime("now"))'
           )
-          .bind(tenantId, validated.tenantName || `${validated.fullName}'s Household`, 'free')
+          .bind(tenantId, validated.tenantName || `${validated.fullName}'s Household`, plan)
           .run()
+      } else {
+        const tenant = await db.prepare('SELECT plan FROM tenants WHERE id = ?').bind(tenantId).first<{ plan: string }>()
+        plan = tenant?.plan || 'free'
       }
 
       await db
@@ -87,39 +91,39 @@ auth.post('/register', async (c) => {
       }
 
       await db.prepare('COMMIT').run()
+
+      // Create default user preferences
+      const prefId = nanoid()
+      await db
+        .prepare(
+          'INSERT INTO user_preferences (id, user_id, tenant_id, email_digest_time, timezone, email_frequency, created_at, updated_at) VALUES (?, ?, ?, "09:00", "UTC", "daily", datetime("now"), datetime("now"))'
+        )
+        .bind(prefId, userId, tenantId)
+        .run()
+
+      // Generate Token
+      if (!c.env.JWT_SECRET) {
+        console.warn('JWT_SECRET is not set in environment variables! Using temporary fallback for development.')
+      }
+      const secret = c.env.JWT_SECRET || 'dev-secret-replace-me-in-production'
+      const token = await generateJWT(userId, tenantId, validated.email, secret)
+
+      return c.json({
+        token,
+        user: {
+          id: userId,
+          tenantId,
+          email: validated.email,
+          fullName: validated.fullName,
+          isOwner: true,
+          plan
+        },
+        message: 'Registration successful',
+      }, 201)
     } catch (err) {
       await db.prepare('ROLLBACK').run()
       throw err
     }
-
-    // Create default user preferences
-    const prefId = nanoid()
-    await db
-      .prepare(
-        'INSERT INTO user_preferences (id, user_id, tenant_id, email_digest_time, timezone, email_frequency, created_at, updated_at) VALUES (?, ?, ?, "09:00", "UTC", "daily", datetime("now"), datetime("now"))'
-      )
-      .bind(prefId, userId, tenantId)
-      .run()
-
-    // Generate Token
-    if (!c.env.JWT_SECRET) {
-      console.warn('JWT_SECRET is not set in environment variables! Using temporary fallback for development.')
-    }
-    const secret = c.env.JWT_SECRET || 'dev-secret-replace-me-in-production'
-    const token = await generateJWT(userId, tenantId, validated.email, secret)
-
-    return c.json({
-      token,
-      user: {
-        id: userId,
-        tenantId,
-        email: validated.email,
-        fullName: validated.fullName,
-        isOwner: true,
-      },
-      message: 'Registration successful',
-    }, 201)
-
   } catch (error) {
     console.error('Registration error:', error)
     if (error instanceof z.ZodError) {
@@ -138,39 +142,38 @@ auth.post('/login', async (c) => {
     const validated = LoginSchema.parse(body)
     const db = c.env.DB
 
-    const user = await db
-      .prepare('SELECT * FROM users WHERE email = ?')
-      .bind(validated.email)
-      .first<{
-        id: string
-        tenant_id: string
-        email: string
-        password_hash: string
-        full_name: string
-        is_owner: number
-      }>()
+    const res = await db.prepare(`
+      SELECT u.*, t.plan 
+      FROM users u 
+      JOIN tenants t ON u.tenant_id = t.id 
+      WHERE u.email = ?
+    `).bind(validated.email).first<{
+      id: string
+      tenant_id: string
+      email: string
+      password_hash: string
+      full_name: string
+      is_owner: number
+      plan: string
+    }>()
 
-    if (!user) {
-      return c.json({ error: 'Invalid email or password' }, 401)
-    }
-
-    const valid = await bcrypt.compare(validated.password, user.password_hash)
-    if (!valid) {
+    if (!res || !(await bcrypt.compare(validated.password, res.password_hash))) {
       return c.json({ error: 'Invalid email or password' }, 401)
     }
 
     // Generate Token
     const secret = c.env.JWT_SECRET || 'dev-secret-replace-me-in-production'
-    const token = await generateJWT(user.id, user.tenant_id, user.email, secret)
+    const token = await generateJWT(res.id, res.tenant_id, res.email, secret)
 
     return c.json({
       token,
       user: {
-        id: user.id,
-        tenantId: user.tenant_id,
-        email: user.email,
-        fullName: user.full_name,
-        isOwner: !!user.is_owner,
+        id: res.id,
+        tenantId: res.tenant_id,
+        email: res.email,
+        fullName: res.full_name,
+        isOwner: !!res.is_owner,
+        plan: res.plan
       },
     })
 
