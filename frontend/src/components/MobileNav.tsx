@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, List, Shield, Settings, PlusCircle } from 'lucide-react'
+import { Home, List, Shield, Users, PlusCircle } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
