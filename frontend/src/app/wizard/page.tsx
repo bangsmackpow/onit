@@ -10,6 +10,7 @@ import {
   ChevronRight, 
   ArrowRight,
   ShieldCheck,
+  Zap,
   Droplets,
   Thermometer,
   Waves
