@@ -31,6 +31,8 @@ interface Stats {
   totalUsers: number
   totalAssets: number
   totalTasks: number
+  growth: { day: string, count: number }[]
+  distribution: { plan: string, count: number }[]
 }
 
 export default function AdminPage() {
@@ -128,6 +130,125 @@ export default function AdminPage() {
             icon={CheckCircle2} 
             color="rose" 
           />
+        </div>
+
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Growth Chart */}
+          <div className="lg:col-span-2 glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8">
+              <TrendingUp className="w-12 h-12 text-white/5 group-hover:text-indigo-500/10 transition-colors duration-700" />
+            </div>
+            
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              <div className="space-y-1">
+                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                  Household Growth
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full uppercase tracking-widest">Last 7 Days</span>
+                </h2>
+                <p className="text-slate-400 font-medium">Daily registration velocity.</p>
+              </div>
+            </div>
+
+            <div className="h-64 w-full flex items-end gap-2 md:gap-4 relative px-4">
+              <div className="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none">
+                {[1, 2, 3, 4].map(i => <div key={i} className="w-full h-px bg-white/[0.03]" />)}
+              </div>
+
+              {stats?.growth.map((point, index) => {
+                const maxCount = Math.max(...stats.growth.map(g => g.count), 5)
+                const heightPercentage = (point.count / maxCount) * 100
+                return (
+                  <div key={point.day} className="flex-1 flex flex-col items-center gap-4 group/bar">
+                    <div className="relative w-full flex flex-col items-center justify-end h-48">
+                      <div className="absolute -top-10 opacity-0 group-hover/bar:opacity-100 transition-all duration-300 scale-90 group-hover/bar:scale-100 z-10 bg-white text-[#020617] px-3 py-1.5 rounded-xl font-black text-xs shadow-xl shadow-indigo-600/20 pointer-events-none after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-white">
+                        {point.count} Added
+                      </div>
+                      <div 
+                        style={{ height: `${Math.max(heightPercentage, 4)}%` }}
+                        className={clsx(
+                          "w-full max-w-[40px] rounded-t-xl transition-all duration-1000 ease-out relative group-hover/bar:max-w-[45px]",
+                          point.count > 0 ? "bg-gradient-to-t from-indigo-600/20 to-indigo-500" : "bg-white/5"
+                        )}
+                      >
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/bar:opacity-100 transition-opacity rounded-t-xl" />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover/bar:text-indigo-400 transition-colors">
+                        {index === stats.growth.length - 1 ? 'Today' : format(parseISO(point.day), 'EEE')}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Distribution Circle */}
+          <div className="glass-card p-10 rounded-[3rem] flex flex-col items-center justify-center text-center relative overflow-hidden group">
+            <div className="space-y-1 mb-10 w-full text-left">
+              <h2 className="text-2xl font-black text-white">Plan Mix</h2>
+              <p className="text-slate-400 font-medium">Free vs Premium tier split.</p>
+            </div>
+
+            <div className="relative w-48 h-48 mb-10">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                {/* Background Ring */}
+                <circle
+                  cx="50" cy="50" r="40"
+                  fill="transparent"
+                  stroke="currentColor"
+                  strokeWidth="12"
+                  className="text-white/5"
+                />
+                {/* Premium Segment */}
+                {(() => {
+                  const premiumCount = stats?.distribution.find(d => d.plan === 'premium')?.count || 0
+                  const total = stats?.totalTenants || 1
+                  const percentage = (premiumCount / total) * 100
+                  const circumference = 2 * Math.PI * 40
+                  const offset = circumference - (percentage / 100) * circumference
+                  
+                  return (
+                    <circle
+                      cx="50" cy="50" r="40"
+                      fill="transparent"
+                      stroke="currentColor"
+                      strokeWidth="12"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={offset}
+                      strokeLinecap="round"
+                      className="text-indigo-500 transition-all duration-1000 ease-in-out"
+                    />
+                  )
+                })()}
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <p className="text-4xl font-black text-white">
+                  {Math.round(((stats?.distribution.find(d => d.plan === 'premium')?.count || 0) / (stats?.totalTenants || 1)) * 100)}%
+                </p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Premium</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full bg-slate-600" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Free</p>
+                </div>
+                <p className="text-xl font-black text-white">{stats?.distribution.find(d => d.plan === 'free')?.count || 0}</p>
+              </div>
+              <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Premium</p>
+                </div>
+                <p className="text-xl font-black text-white">{stats?.distribution.find(d => d.plan === 'premium')?.count || 0}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Households List */}

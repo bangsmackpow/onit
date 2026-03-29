@@ -11,11 +11,19 @@ admin.get('/stats', async (c) => {
   try {
     const db = c.env.DB
     
-    const [tenants, users, assets, tasks] = await Promise.all([
+    const [tenants, users, assets, tasks, growth, distribution] = await Promise.all([
       db.prepare('SELECT COUNT(*) as count FROM tenants').first<{ count: number }>(),
       db.prepare('SELECT COUNT(*) as count FROM users').first<{ count: number }>(),
       db.prepare('SELECT COUNT(*) as count FROM assets').first<{ count: number }>(),
-      db.prepare('SELECT COUNT(*) as count FROM tasks').first<{ count: number }>()
+      db.prepare('SELECT COUNT(*) as count FROM tasks').first<{ count: number }>(),
+      db.prepare(`
+        SELECT date(created_at) as day, COUNT(*) as count 
+        FROM tenants 
+        WHERE created_at >= date('now', '-7 days') 
+        GROUP BY day 
+        ORDER BY day ASC
+      `).all(),
+      db.prepare('SELECT plan, COUNT(*) as count FROM tenants GROUP BY plan').all()
     ])
 
     return c.json({
@@ -23,7 +31,9 @@ admin.get('/stats', async (c) => {
         totalTenants: tenants?.count || 0,
         totalUsers: users?.count || 0,
         totalAssets: assets?.count || 0,
-        totalTasks: tasks?.count || 0
+        totalTasks: tasks?.count || 0,
+        growth: growth.results || [],
+        distribution: distribution.results || []
       }
     })
   } catch (error) {
