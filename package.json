@@ -15,7 +15,8 @@
     "clean": "rm -rf frontend/.next frontend/node_modules node_modules"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.0",
+    "wrangler": "^4.78.0"
   },
   "engines": {
     "node": ">=18.0.0",

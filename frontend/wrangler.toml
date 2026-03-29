@@ -4,5 +4,5 @@ pages_build_output_dir = "out"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "maintenance-schedule"
-database_id = "f2199f1a-b32b-479c-bef3-479cbc8bde9d"
+database_name = "maintenance-scheduler"
+database_id = "3e58d3c9-e3fc-4619-bce8-d6101bbb612b"
