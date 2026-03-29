@@ -1,6 +1,6 @@
 name = "maintenance-scheduler"
 compatibility_date = "2024-03-28"
-pages_build_output_dir = "out"
+pages_build_output_dir = "frontend/out"
 
 [[d1_databases]]
 binding = "DB"
