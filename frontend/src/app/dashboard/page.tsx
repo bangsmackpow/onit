@@ -139,12 +139,28 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {[1, 2, 3].map(i => <div key={i} className="h-24 glass-card animate-pulse rounded-[2rem]" />)}
               </div>
+            ) : assets.length === 0 ? (
+              <div className="glass-card rounded-[3rem] p-16 text-center relative overflow-hidden group border border-indigo-500/20 bg-indigo-500/[0.02]">
+                <div className="glow-mesh opacity-30" />
+                <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-700">
+                  <Zap className="w-10 h-10 text-indigo-400" />
+                </div>
+                <h3 className="text-3xl font-black text-white mb-4">Welcome to ONIT</h3>
+                <p className="text-slate-400 mb-10 max-w-sm mx-auto text-lg leading-relaxed">Let's set up your household maintenance schedule. It takes less than 2 minutes.</p>
+                <Link 
+                  href="/wizard" 
+                  className="btn-premium btn-premium-primary inline-flex px-12 py-5 text-lg"
+                >
+                  Start Onboarding
+                  <ChevronRight className="w-6 h-6" />
+                </Link>
+              </div>
             ) : tasks.length === 0 ? (
               <div className="glass-card rounded-[3rem] p-16 text-center relative overflow-hidden group">
                 <div className="glow-mesh" />
                 <CheckCircle2 className="w-16 h-16 text-slate-800 mx-auto mb-6 transition-transform group-hover:scale-110 duration-500" />
                 <h3 className="text-2xl font-black text-white mb-2">All Tasks Complete</h3>
-                <p className="text-slate-400 mb-8 max-w-sm mx-auto font-medium">Great job! All your household maintenance is up to date. Your home is running smoothly.</p>
+                <p className="text-slate-400 mb-8 max-w-sm mx-auto font-medium">Great job! All your household maintenance is up to date.</p>
                 <Link 
                   href="/tasks/new" 
                   className="btn-premium btn-premium-primary inline-flex"

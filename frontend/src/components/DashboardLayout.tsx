@@ -16,6 +16,7 @@ import {
   Bell,
   Search
 } from 'lucide-react'
+import MobileNav from './MobileNav'
 
 interface Props {
   children: ReactNode
@@ -159,6 +160,9 @@ export default function DashboardLayout({ children }: Props) {
           {children}
         </main>
       </div>
+
+      {/* Global Mobile Navigation */}
+      <MobileNav />
     </div>
   )
 }

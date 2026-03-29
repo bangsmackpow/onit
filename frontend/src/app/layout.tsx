@@ -18,16 +18,22 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: 'ONIT | Family Household Maintenance',
-  description: 'Easily track and schedule maintenance for your home, vehicles, and appliances.',
+  description: 'Smart maintenance tracking and reminders for your family household.',
   icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icon-192.png' },
+      { url: '/icon-512.png', sizes: '512x512' },
+    ],
   },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'ONIT Scheduler',
+    title: 'ONIT',
   },
 }
 
