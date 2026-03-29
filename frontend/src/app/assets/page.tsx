@@ -194,7 +194,7 @@ export default function AssetsPage() {
 
                 <div className="p-4 bg-white/[0.02] border-t border-white/5 group-hover:bg-indigo-600 transition-all">
                   <Link 
-                    href={`/assets/${asset.id}`} 
+                    href={`/assets/detail?id=${asset.id}`} 
                     className="flex items-center justify-between px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-300 group-hover:text-white"
                   >
                     View Item Details
