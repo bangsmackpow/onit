@@ -20,7 +20,8 @@ export async function authMiddleware(c: Context<{ Bindings: Env; Variables: Vari
   const token = authHeader.slice(7) // Remove "Bearer " prefix
 
   try {
-    const secret = new TextEncoder().encode(c.env.JWT_SECRET)
+    const secretStr = c.env.JWT_SECRET || 'dev-secret-replace-me-in-production'
+    const secret = new TextEncoder().encode(secretStr)
     const verified = await jose.jwtVerify(token, secret)
     
     const payload = verified.payload as JWTPayload

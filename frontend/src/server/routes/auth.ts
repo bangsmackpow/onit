@@ -67,7 +67,11 @@ auth.post('/register', async (c) => {
       .run()
 
     // Generate Token
-    const token = await generateJWT(userId, tenantId, validated.email, c.env.JWT_SECRET)
+    if (!c.env.JWT_SECRET) {
+      console.warn('JWT_SECRET is not set in environment variables! Using temporary fallback for development.')
+    }
+    const secret = c.env.JWT_SECRET || 'dev-secret-replace-me-in-production'
+    const token = await generateJWT(userId, tenantId, validated.email, secret)
 
     return c.json({
       token,
@@ -86,7 +90,7 @@ auth.post('/register', async (c) => {
     if (error instanceof z.ZodError) {
       return c.json({ error: 'Validation error', details: error.errors }, 400)
     }
-    return c.json({ error: 'Failed to register' }, 500)
+    return c.json({ error: 'Failed to register', details: String(error) }, 500)
   }
 })
 
@@ -121,7 +125,8 @@ auth.post('/login', async (c) => {
     }
 
     // Generate Token
-    const token = await generateJWT(user.id, user.tenant_id, user.email, c.env.JWT_SECRET)
+    const secret = c.env.JWT_SECRET || 'dev-secret-replace-me-in-production'
+    const token = await generateJWT(user.id, user.tenant_id, user.email, secret)
 
     return c.json({
       token,
@@ -139,7 +144,7 @@ auth.post('/login', async (c) => {
     if (error instanceof z.ZodError) {
       return c.json({ error: 'Validation error', details: error.errors }, 400)
     }
-    return c.json({ error: 'Failed to login' }, 500)
+    return c.json({ error: 'Failed to login', details: String(error) }, 500)
   }
 })
 
