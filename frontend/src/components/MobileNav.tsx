@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { name: 'Assets', href: '/assets', icon: Shield },
   { name: 'Add', href: '/wizard', icon: PlusCircle, highlight: true },
   { name: 'Tasks', href: '/tasks', icon: List },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Family', href: '/dashboard/family', icon: Users },
 ]
 
 export default function MobileNav() {

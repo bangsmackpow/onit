@@ -16,7 +16,7 @@ interface AuthStore {
   error: string | null
 
   // Actions
-  register: (tenantName: string, fullName: string, email: string, password: string) => Promise<void>
+  register: (tenantName: string, fullName: string, email: string, password: string, inviteToken?: string) => Promise<void>
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   setToken: (token: string) => void
@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   loading: false,
   error: null,
 
-  register: async (tenantName, fullName, email, password) => {
+  register: async (tenantName, fullName, email, password, inviteToken) => {
     set({ loading: true, error: null })
     try {
       const response = await axios.post(`${API_URL}/api/auth/register`, {
@@ -39,6 +39,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         fullName,
         email,
         password,
+        inviteToken
       })
 
       const { token, user } = response.data

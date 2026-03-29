@@ -14,7 +14,8 @@ import {
   Menu, 
   X,
   Bell,
-  Search
+  Search,
+  Users
 } from 'lucide-react'
 import MobileNav from './MobileNav'
 
@@ -42,6 +43,7 @@ export default function DashboardLayout({ children }: Props) {
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Assets', href: '/assets', icon: Package },
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
+    { name: 'Family', href: '/dashboard/family', icon: Users },
     { name: 'Activity', href: '/history', icon: History },
   ]
 

@@ -4,11 +4,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
-import { Mail, Lock, User, Building, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Mail, Lock, User, Building, AlertCircle, ArrowRight, ShieldCheck, UserPlus } from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const inviteToken = searchParams.get('token')
   const { register, loading, error, user } = useAuthStore()
 
   const [formData, setFormData] = useState({
@@ -41,7 +44,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await register(formData.tenantName, formData.fullName, formData.email, formData.password)
+      await register(formData.tenantName, formData.fullName, formData.email, formData.password, inviteToken || undefined)
       router.push('/dashboard')
     } catch (err: any) {
       setLocalError(err.response?.data?.error || 'Registration failed')
@@ -70,10 +73,20 @@ export default function RegisterPage() {
               <User className="w-10 h-10 text-white relative z-10" />
             </div>
             <h1 className="text-4xl font-black text-white tracking-tighter mb-3">
-              CREATE ACCOUNT
+              {inviteToken ? 'JOIN HOUSEHOLD' : 'CREATE ACCOUNT'}
             </h1>
-            <p className="text-slate-400 font-medium text-sm tracking-wide">Enter your information below to get started</p>
+            <p className="text-slate-400 font-medium text-sm tracking-wide">
+              {inviteToken ? 'You have been invited to join a household.' : 'Enter your information below to get started'}
+            </p>
           </div>
+
+          {/* Invitation Badge */}
+          {inviteToken && (
+            <div className="mb-8 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center gap-3">
+              <UserPlus className="w-5 h-5 text-indigo-400" />
+              <p className="text-indigo-200 text-xs font-bold">Invitation Active</p>
+            </div>
+          )}
 
           {/* Error Message */}
           {(error || localError) && (
@@ -123,23 +136,25 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Household Name */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
-                Household Name (Optional)
-              </label>
-              <div className="relative group">
-                <Building className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
-                <input
-                  type="text"
-                  value={formData.tenantName}
-                  onChange={(e) => setFormData({ ...formData, tenantName: e.target.value })}
-                  placeholder="The Smith Home"
-                  className="input-premium pl-14"
-                  disabled={loading}
-                />
+            {/* Household Name (Only if NOT joining) */}
+            {!inviteToken && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">
+                  Household Name (Optional)
+                </label>
+                <div className="relative group">
+                  <Building className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                  <input
+                    type="text"
+                    value={formData.tenantName}
+                    onChange={(e) => setFormData({ ...formData, tenantName: e.target.value })}
+                    placeholder="The Smith Home"
+                    className="input-premium pl-14"
+                    disabled={loading}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Password */}
             <div className="space-y-2">

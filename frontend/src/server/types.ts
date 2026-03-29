@@ -2,7 +2,7 @@
 export interface Env {
   DB: D1Database
   JWT_SECRET: string
-  BUCKET_R2: R2Bucket
+  MEDIA: R2Bucket
   SMTP2GO_API_KEY: string
   SMTP_FROM_EMAIL: string
 }

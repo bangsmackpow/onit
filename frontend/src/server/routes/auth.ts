@@ -4,14 +4,15 @@ import { z } from 'zod'
 import { nanoid } from 'nanoid'
 import * as bcrypt from 'bcryptjs'
 import { generateJWT } from '../middleware/auth'
-import { Env } from '../types'
+import { Env, Variables } from '../types'
 
-const auth = new Hono<{ Bindings: Env }>()
+const auth = new Hono<{ Bindings: Env, Variables: Variables }>()
 
 const RegisterSchema = z.object({
+  fullName: z.string().min(2).max(100),
   email: z.string().email(),
   password: z.string().min(8),
-  fullName: z.string().min(2),
+  inviteToken: z.string().optional(),
   tenantName: z.string().optional(),
 })
 
@@ -39,23 +40,57 @@ auth.post('/register', async (c) => {
       return c.json({ error: 'User already exists' }, 409)
     }
 
-    // Create Tenant
-    const tenantId = nanoid()
-    await db
-      .prepare('INSERT INTO tenants (id, name, plan, created_at, updated_at) VALUES (?, ?, "free", datetime("now"), datetime("now"))')
-      .bind(tenantId, validated.tenantName || 'Household')
-      .run()
+    // Determine tenant context: New household or joining via Invite
+    let tenantIdByInvite: string | null = null
+    let assignedRole: string = 'admin'
 
-    // Create User
+    if (validated.inviteToken) {
+      const invite = await db
+        .prepare('SELECT tenant_id, role FROM invitations WHERE token = ? AND expires_at > datetime("now")')
+        .bind(validated.inviteToken)
+        .first<{ tenant_id: string; role: string }>()
+      
+      if (!invite) {
+        return c.json({ error: 'Invalid or expired invitation token' }, 400)
+      }
+      tenantIdByInvite = invite.tenant_id
+      assignedRole = invite.role
+    }
+
+    const tenantId = tenantIdByInvite || nanoid()
     const userId = nanoid()
-    const passwordHash = await bcrypt.hash(validated.password, 10)
-    
-    await db
-      .prepare(
-        'INSERT INTO users (id, tenant_id, email, password_hash, full_name, is_owner, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, datetime("now"), datetime("now"))'
-      )
-      .bind(userId, tenantId, validated.email, passwordHash, validated.fullName)
-      .run()
+    const hashedPassword = await bcrypt.hash(validated.password, 10)
+
+    // Transaction for registration
+    await db.prepare('BEGIN TRANSACTION').run()
+    try {
+      if (!tenantIdByInvite) {
+        // Create new tenant if not joining one
+        await db
+          .prepare(
+            'INSERT INTO tenants (id, name, plan, created_at, updated_at) VALUES (?, ?, ?, datetime("now"), datetime("now"))'
+          )
+          .bind(tenantId, validated.tenantName || `${validated.fullName}'s Household`, 'free')
+          .run()
+      }
+
+      await db
+        .prepare(
+          'INSERT INTO users (id, tenant_id, full_name, email, password_hash, role, is_owner, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, datetime("now"), datetime("now"))'
+        )
+        .bind(userId, tenantId, validated.fullName, validated.email, hashedPassword, assignedRole, tenantIdByInvite ? 0 : 1)
+        .run()
+
+      // Delete the invitation if used
+      if (validated.inviteToken) {
+        await db.prepare('DELETE FROM invitations WHERE token = ?').bind(validated.inviteToken).run()
+      }
+
+      await db.prepare('COMMIT').run()
+    } catch (err) {
+      await db.prepare('ROLLBACK').run()
+      throw err
+    }
 
     // Create default user preferences
     const prefId = nanoid()
@@ -145,6 +180,26 @@ auth.post('/login', async (c) => {
       return c.json({ error: 'Validation error', details: error.errors }, 400)
     }
     return c.json({ error: 'Failed to login', details: String(error) }, 500)
+  }
+})
+
+// ============================================================================
+// GET ALL MEMBERS FOR TENANT
+// ============================================================================
+auth.get('/members', async (c) => {
+  try {
+    const tenantId = c.get('tenantId') as string
+    const db = c.env.DB
+
+    const result = await db
+      .prepare('SELECT id, full_name, email, role, is_owner, created_at FROM users WHERE tenant_id = ? ORDER BY is_owner DESC, created_at ASC')
+      .bind(tenantId)
+      .all()
+
+    return c.json({ members: result.results || [] })
+  } catch (error) {
+    console.error('Error fetching members:', error)
+    return c.json({ error: 'Failed to fetch members' }, 500)
   }
 })
 
