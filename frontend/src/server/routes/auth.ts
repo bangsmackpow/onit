@@ -152,6 +152,7 @@ auth.get('/me', authMiddleware, async (c) => {
         u.email, 
         u.full_name as full_name, 
         u.is_owner as is_owner, 
+        u.is_system_admin as is_system_admin,
         t.name as tenant_name,
         t.plan as plan 
       FROM users u 
@@ -163,6 +164,7 @@ auth.get('/me', authMiddleware, async (c) => {
       email: string
       full_name: string
       is_owner: number
+      is_system_admin: number
       tenant_name: string
       plan: string
     }>()
@@ -178,8 +180,9 @@ auth.get('/me', authMiddleware, async (c) => {
         email: res.email,
         fullName: res.full_name,
         isOwner: !!res.is_owner,
+        tenantName: res.tenant_name,
         plan: res.plan?.toLowerCase().trim() || 'free',
-        isAdmin: res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
+        isAdmin: !!res.is_system_admin || res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
       },
     })
   } catch (error) {
@@ -202,6 +205,7 @@ auth.post('/login', async (c) => {
         u.password_hash as password_hash, 
         u.full_name as full_name, 
         u.is_owner as is_owner, 
+        u.is_system_admin as is_system_admin,
         t.name as tenant_name,
         t.plan as plan 
       FROM users u 
@@ -214,6 +218,7 @@ auth.post('/login', async (c) => {
       password_hash: string
       full_name: string
       is_owner: number
+      is_system_admin: number
       tenant_name: string
       plan: string
     }>()
@@ -236,7 +241,7 @@ auth.post('/login', async (c) => {
         isOwner: !!res.is_owner,
         tenantName: res.tenant_name,
         plan: res.plan?.toLowerCase().trim() || 'free',
-        isAdmin: res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
+        isAdmin: !!res.is_system_admin || res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
       },
     })
 
