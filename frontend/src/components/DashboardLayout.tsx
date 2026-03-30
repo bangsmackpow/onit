@@ -19,7 +19,8 @@ import {
   Users,
   Star,
   Zap,
-  Shield
+  Shield,
+  RefreshCcw
 } from 'lucide-react'
 import MobileNav from './MobileNav'
 
@@ -162,6 +163,22 @@ export default function DashboardLayout({ children }: Props) {
               <LogOut className="mr-3 h-4 w-4" />
               Sign Out
             </button>
+
+            {/* Temporary Debug Info */}
+            {user.isAdmin && (
+              <div className="mt-8 p-3 rounded-xl bg-slate-900 border border-white/5 text-[8px] font-mono text-slate-500 overflow-hidden">
+                <p className="mb-2 font-black uppercase text-rose-500/50">System Debug</p>
+                <p>Plan: <span className="text-white">{user.plan}</span></p>
+                <p>Tenant: <span className="text-white">{user.tenantId}</span></p>
+                <p>Email: <span className="text-white">{user.email}</span></p>
+                <button 
+                  onClick={() => refreshUser()}
+                  className="mt-2 w-full flex items-center justify-center gap-1 py-1 bg-white/5 hover:bg-white/10 rounded-lg text-rose-400 group-hover:text-rose-300 transition-all border border-rose-500/20"
+                >
+                  <RefreshCcw className="w-2 h-2" /> Force Refresh
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </aside>
