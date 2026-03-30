@@ -164,13 +164,14 @@ export default function DashboardLayout({ children }: Props) {
               Sign Out
             </button>
 
-            {/* Temporary Debug Info */}
-            {user.isAdmin && (
+            {/* Temporary Debug Info - Visible to all for triage */}
+            {user && (
               <div className="mt-8 p-3 rounded-xl bg-slate-900 border border-white/5 text-[8px] font-mono text-slate-500 overflow-hidden">
                 <p className="mb-2 font-black uppercase text-rose-500/50">System Debug</p>
                 <p>Plan: <span className="text-white">{user.plan}</span></p>
                 <p>Tenant: <span className="text-white">{user.tenantId}</span></p>
                 <p>Email: <span className="text-white">{user.email}</span></p>
+                <p>IsAdmin: <span className="text-white">{String(user.isAdmin)}</span></p>
                 <button 
                   onClick={() => refreshUser()}
                   className="mt-2 w-full flex items-center justify-center gap-1 py-1 bg-white/5 hover:bg-white/10 rounded-lg text-rose-400 group-hover:text-rose-300 transition-all border border-rose-500/20"
