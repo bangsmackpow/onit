@@ -146,7 +146,14 @@ auth.get('/me', authMiddleware, async (c) => {
     const db = c.env.DB
 
     const res = await db.prepare(`
-      SELECT u.id, u.tenant_id, u.email, u.full_name, u.is_owner, t.plan 
+      SELECT 
+        u.id, 
+        u.tenant_id as tenant_id, 
+        u.email, 
+        u.full_name as full_name, 
+        u.is_owner as is_owner, 
+        t.name as tenant_name,
+        t.plan as plan 
       FROM users u 
       JOIN tenants t ON u.tenant_id = t.id 
       WHERE u.id = ?
@@ -156,6 +163,7 @@ auth.get('/me', authMiddleware, async (c) => {
       email: string
       full_name: string
       is_owner: number
+      tenant_name: string
       plan: string
     }>()
 
@@ -187,7 +195,15 @@ auth.post('/login', async (c) => {
     const db = c.env.DB
 
     const res = await db.prepare(`
-      SELECT u.*, t.plan 
+      SELECT 
+        u.id, 
+        u.tenant_id as tenant_id, 
+        u.email, 
+        u.password_hash as password_hash, 
+        u.full_name as full_name, 
+        u.is_owner as is_owner, 
+        t.name as tenant_name,
+        t.plan as plan 
       FROM users u 
       JOIN tenants t ON u.tenant_id = t.id 
       WHERE u.email = ?
@@ -198,6 +214,7 @@ auth.post('/login', async (c) => {
       password_hash: string
       full_name: string
       is_owner: number
+      tenant_name: string
       plan: string
     }>()
 
@@ -217,6 +234,7 @@ auth.post('/login', async (c) => {
         email: res.email,
         fullName: res.full_name,
         isOwner: !!res.is_owner,
+        tenantName: res.tenant_name,
         plan: res.plan?.toLowerCase().trim() || 'free',
         isAdmin: res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
       },

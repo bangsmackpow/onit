@@ -172,6 +172,10 @@ export default function DashboardLayout({ children }: Props) {
                 <p>Tenant: <span className="text-white">{user.tenantId}</span></p>
                 <p>Email: <span className="text-white">{user.email}</span></p>
                 <p>IsAdmin: <span className="text-white">{String(user.isAdmin)}</span></p>
+                <div className="mt-2 pt-2 border-t border-white/5">
+                   <p className="mb-1 text-rose-400 opacity-50">Raw User Data:</p>
+                   <pre className="whitespace-pre-wrap break-all">{JSON.stringify(user, null, 2)}</pre>
+                </div>
                 <button 
                   onClick={() => refreshUser()}
                   className="mt-2 w-full flex items-center justify-center gap-1 py-1 bg-white/5 hover:bg-white/10 rounded-lg text-rose-400 group-hover:text-rose-300 transition-all border border-rose-500/20"

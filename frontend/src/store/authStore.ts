@@ -7,6 +7,7 @@ interface User {
   tenantId: string
   email: string
   fullName: string
+  tenantName: string
   plan: 'free' | 'premium'
   isAdmin: boolean
 }
