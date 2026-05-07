@@ -10,6 +10,7 @@ interface User {
   tenantName: string
   plan: 'free' | 'premium'
   isAdmin: boolean
+  isOwner: boolean
 }
 
 interface AuthStore {
