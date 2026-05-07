@@ -97,6 +97,17 @@ function AssetDetailsContent() {
     }
   }
 
+  const handleDeleteMedia = async (mediaId: string) => {
+    if (!confirm('Are you sure you want to delete this file?')) return
+    try {
+      await apiDelete(`/api/media/${mediaId}`)
+      setMedia(media.filter(m => m.id !== mediaId))
+    } catch (err) {
+      console.error('Delete media failed', err)
+      alert('Failed to delete file.')
+    }
+  }
+
   const getTypeIcon = (type?: string) => {
     switch (type) {
       case 'car': return <Car className="w-8 h-8" />
@@ -146,6 +157,12 @@ function AssetDetailsContent() {
           Back to Household
         </Link>
         <div className="flex items-center gap-2">
+          <Link
+            href={`/assets/edit?id=${id}`}
+            className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-slate-400 hover:text-white transition-all border border-white/10"
+          >
+            <Settings className="w-5 h-5" />
+          </Link>
           <button 
             onClick={handleDeleteAsset}
             className="p-3 bg-rose-500/10 hover:bg-rose-500/20 rounded-2xl text-rose-400 transition-all border border-rose-500/10"
@@ -269,14 +286,22 @@ function AssetDetailsContent() {
                     <p className="text-[10px] text-white font-black uppercase tracking-tight truncate max-w-[100px]">
                       {item.file_name}
                     </p>
-                    <a 
-                      href={item.url} 
-                      target="_blank" 
-                      rel="noreferrer"
-                      className="p-2 transition-colors hover:text-emerald-400"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                    <div className="flex items-center gap-1">
+                      <a 
+                        href={item.url} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="p-2 transition-colors hover:text-emerald-400"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                      <button 
+                        onClick={() => handleDeleteMedia(item.id)}
+                        className="p-2 transition-colors hover:text-rose-400"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

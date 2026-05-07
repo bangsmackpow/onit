@@ -2,6 +2,7 @@
 import type { Metadata, Viewport } from 'next'
 import { ReactNode } from 'react'
 import { Inter, Outfit } from 'next/font/google'
+import CommandPalette from '@/components/CommandPalette'
 import './globals.css'
 
 const inter = Inter({ 
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body className="bg-slate-950 font-sans antialiased text-slate-200">
         <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pointer-events-none" />
+        <CommandPalette />
         {children}
       </body>
     </html>

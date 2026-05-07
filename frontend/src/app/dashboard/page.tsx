@@ -208,8 +208,11 @@ export default function DashboardPage() {
             )}
           </div>
 
+import PushNotificationManager from '@/components/PushNotificationManager'
+...
           {/* Sidebar Area */}
           <div className="space-y-8">
+            <PushNotificationManager />
             <h2 className="text-xl font-black text-white pl-2">Quick Actions</h2>
             <div className="glass-card p-8 rounded-[2.5rem] relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4">

@@ -16,7 +16,8 @@ import {
   ShieldCheck,
   ChevronRight,
   TrendingDown,
-  X
+  X,
+  Settings
 } from 'lucide-react'
 import Link from 'next/link'
 import { format, isBefore, parseISO } from 'date-fns'
@@ -35,6 +36,7 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'overdue' | 'upcoming'>('all')
   const [completingTaskId, setCompletingTaskId] = useState<string | null>(null)
+  const [snoozingTaskId, setSnoozingTaskId] = useState<string | null>(null)
   const [completionData, setCompletionData] = useState({
     notes: '',
     mileage: '',
@@ -73,6 +75,18 @@ export default function TasksPage() {
       fetchTasks()
     } catch (err) {
       alert('Failed to complete task')
+    }
+  }
+
+  async function handleSnooze(days: number) {
+    if (!snoozingTaskId) return
+
+    try {
+      await apiPost(`/api/tasks/${snoozingTaskId}/snooze`, { days })
+      setSnoozingTaskId(null)
+      fetchTasks()
+    } catch (err) {
+      alert('Failed to snooze task')
     }
   }
 
@@ -178,14 +192,30 @@ export default function TasksPage() {
                     {task.description && <p className="text-sm font-medium text-slate-500 mt-4 line-clamp-1 max-w-2xl">{task.description}</p>}
                   </div>
 
-                  <div className="flex items-center gap-8">
-                    <div className="text-right flex-shrink-0">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="text-right flex-shrink-0 mr-4">
                       <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`}>Due Date</p>
                       <p className={`text-xl font-black ${isOverdue ? 'text-rose-400' : 'text-white'}`}>
                         {format(parseISO(task.next_due_date), 'MMM d, yyyy')}
                       </p>
                     </div>
                     
+                    <Link 
+                      href={`/tasks/edit?id=${task.id}`}
+                      className="p-4 rounded-2xl bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                      title="Edit Protocol"
+                    >
+                      <Settings className="w-5 h-5" />
+                    </Link>
+
+                    <button 
+                      onClick={() => setSnoozingTaskId(task.id)}
+                      className="p-4 rounded-2xl bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                      title="Snooze Reminder"
+                    >
+                      <Clock className="w-5 h-5" />
+                    </button>
+
                     <button 
                       onClick={() => setCompletingTaskId(task.id)}
                       className="btn-premium btn-premium-secondary group/btn border-indigo-500/30"
@@ -201,6 +231,38 @@ export default function TasksPage() {
           </div>
         )}
       </div>
+
+      {/* Snooze Modal */}
+      {snoozingTaskId && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 sm:p-12 transition-all duration-500">
+          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl animate-in fade-in duration-500" onClick={() => setSnoozingTaskId(null)}></div>
+          <div className="relative glass-card w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500 border-white/10">
+            <div className="p-10 text-center">
+              <Clock className="w-12 h-12 text-indigo-500 mx-auto mb-6" />
+              <h2 className="text-2xl font-black text-white mb-2">Snooze Reminder</h2>
+              <p className="text-slate-400 text-sm font-medium mb-8">Postpone this notification for a few days.</p>
+              
+              <div className="grid gap-3">
+                {[3, 7, 14].map(days => (
+                  <button
+                    key={days}
+                    onClick={() => handleSnooze(days)}
+                    className="w-full py-4 rounded-2xl bg-white/5 border border-white/5 text-white font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-600 hover:border-indigo-500 transition-all"
+                  >
+                    Snooze {days} Days
+                  </button>
+                ))}
+                <button
+                  onClick={() => setSnoozingTaskId(null)}
+                  className="mt-4 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Completion Modal */}
       {completingTaskId && (
