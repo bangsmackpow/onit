@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, BellOff, ShieldCheck, Zap } from 'lucide-react'
+import { Bell, BellOff, ShieldCheck } from 'lucide-react'
 import { apiPost } from '@/lib/apiClient'
 import { clsx } from 'clsx'
 

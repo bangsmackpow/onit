@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import PushNotificationManager from '@/components/PushNotificationManager'
 import { apiGet } from '@/lib/apiClient'
 import { 
   Plus, 

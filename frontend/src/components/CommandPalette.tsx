@@ -6,7 +6,6 @@ import {
   Search, 
   Package, 
   CheckSquare, 
-  History, 
   ArrowRight,
   Command,
   X,
