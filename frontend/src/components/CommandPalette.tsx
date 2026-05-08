@@ -86,7 +86,7 @@ export default function CommandPalette() {
             type: 'knowledge',
             title: art.title,
             subtitle: `Guide • ${art.category}`,
-            url: `/knowledge/${art.id}`
+            url: `/knowledge/detail?id=${art.id}`
           }))
 
         setResults([...knowledge, ...assets, ...tasks].slice(0, 10))
