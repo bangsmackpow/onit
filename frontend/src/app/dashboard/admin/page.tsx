@@ -82,6 +82,17 @@ export default function AdminPage() {
     t.id.includes(search)
   )
 
+  const handleSeedKnowledge = async () => {
+    if (!confirm('Populate the production database with initial guides?')) return
+    try {
+      await apiPost('/api/admin/seed-knowledge', {})
+      alert('Knowledge base synchronized successfully.')
+    } catch (err) {
+      console.error('Seed failed', err)
+      alert('Failed to seed archives.')
+    }
+  }
+
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto space-y-10 pb-24">
@@ -95,13 +106,22 @@ export default function AdminPage() {
             <p className="text-slate-400 text-lg">System-wide monitoring and household administration.</p>
           </div>
           
-          <button 
-            onClick={fetchData}
-            className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-slate-300 hover:bg-white/10 transition-all font-bold"
-          >
-            <RefreshCcw className={clsx("w-4 h-4", loading && "animate-spin")} />
-            Refresh Data
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleSeedKnowledge}
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-indigo-400 hover:bg-indigo-500/20 transition-all font-bold"
+            >
+              <Database className="w-4 h-4" />
+              Seed Archives
+            </button>
+            <button 
+              onClick={fetchData}
+              className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-slate-300 hover:bg-white/10 transition-all font-bold"
+            >
+              <RefreshCcw className={clsx("w-4 h-4", loading && "animate-spin")} />
+              Refresh Data
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}

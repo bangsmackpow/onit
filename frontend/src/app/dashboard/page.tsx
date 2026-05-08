@@ -130,7 +130,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-4">
                       <Link 
-                        href={`/tasks?id=${task.id}`} // Mock link to action
+                        href={`/knowledge?q=${encodeURIComponent(task.task_name)}`}
                         className="btn-zen-secondary px-6"
                       >
                         <BookOpen className="w-4 h-4" />
