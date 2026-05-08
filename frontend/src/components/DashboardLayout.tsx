@@ -18,11 +18,11 @@ import {
   Search,
   Users,
   Star,
-  Zap,
   Shield,
-  RefreshCcw
+  BookOpen
 } from 'lucide-react'
 import MobileNav from './MobileNav'
+import Logo from './Logo'
 
 interface Props {
   children: ReactNode
@@ -46,11 +46,11 @@ export default function DashboardLayout({ children }: Props) {
   }, [user, router])
 
   const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Assets', href: '/assets', icon: Package },
-    { name: 'Tasks', href: '/tasks', icon: CheckSquare },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Household', href: '/assets', icon: Package },
+    { name: 'Protocol', href: '/tasks', icon: CheckSquare },
     { name: 'Family', href: '/dashboard/family', icon: Users },
-    { name: 'Activity', href: '/history', icon: History },
+    { name: 'History', href: '/history', icon: History },
   ]
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
@@ -58,171 +58,144 @@ export default function DashboardLayout({ children }: Props) {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-300 flex overflow-hidden">
-      {/* Background Glows */}
-      <div className="fixed top-0 left-0 w-full h-[500px] bg-indigo-600/5 blur-[120px] -z-10" />
-      <div className="fixed bottom-0 right-0 w-full h-[500px] bg-emerald-600/5 blur-[120px] -z-10" />
-
+    <div className="min-h-screen bg-white text-slate-900 flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity lg:hidden"
           onClick={toggleSidebar}
         ></div>
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-72 glass-sidebar transform transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-slate-100 transform transition-transform duration-500 lg:translate-x-0 lg:static lg:inset-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="h-full flex flex-col p-6">
+        <div className="h-full flex flex-col p-8">
           {/* Logo */}
-          <div className="flex items-center justify-between mb-10 pl-2">
-            <span className="text-3xl font-black text-white tracking-tighter flex items-center gap-2">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg shadow-lg shadow-indigo-600/40" />
-              ONIT<span className="text-indigo-500">.</span>
-            </span>
-            <button className="lg:hidden p-2 hover:bg-white/5 rounded-xl text-slate-400" onClick={toggleSidebar}>
+          <div className="flex items-center justify-between mb-16">
+            <Link href="/dashboard">
+              <Logo />
+            </Link>
+            <button className="lg:hidden p-2 hover:bg-slate-50 rounded-xl text-slate-400" onClick={toggleSidebar}>
               <X className="w-6 h-6" />
             </button>
           </div>
 
           {/* Navigation */}
-          <div className="flex-1 space-y-8">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 ml-4">Main Menu</p>
-              <nav className="space-y-1">
-                {navigation.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`nav-item ${isActive ? 'nav-item-active' : 'nav-item-inactive'}`}
-                      onClick={() => setIsSidebarOpen(false)}
-                    >
-                      <item.icon className={`mr-3 h-5 w-5 transition-colors ${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                      {item.name}
-                    </Link>
-                  )
-                })}
-              </nav>
-            </div>
-            
-            {user.isAdmin && (
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-4 ml-4">System</p>
-                <nav className="space-y-1">
+          <div className="flex-1 space-y-12">
+            <nav className="space-y-2">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href
+                return (
                   <Link
-                    href="/dashboard/admin"
-                    className={`nav-item ${pathname === '/dashboard/admin' ? 'bg-rose-500/10 text-white' : 'text-slate-400 hover:bg-rose-500/5 hover:text-rose-400'}`}
+                    key={item.name}
+                    href={item.href}
+                    className={`nav-item-zen ${isActive ? 'nav-item-zen-active' : 'nav-item-zen-inactive'}`}
                     onClick={() => setIsSidebarOpen(false)}
                   >
-                    <Shield className={`mr-3 h-5 w-5 transition-colors ${pathname === '/dashboard/admin' ? 'text-rose-400' : 'text-slate-500'}`} />
-                    Admin Console
+                    <item.icon className={`mr-4 h-5 w-5 transition-colors ${isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-900'}`} />
+                    {item.name}
                   </Link>
-                </nav>
-              </div>
-            )}
+                )
+              })}
+            </nav>
+
+            <div className="pt-8 border-t border-slate-50">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 px-6">Resources</p>
+              <Link
+                href="/knowledge"
+                className={`nav-item-zen ${pathname === '/knowledge' ? 'nav-item-zen-active' : 'nav-item-zen-inactive'}`}
+              >
+                <BookOpen className="mr-4 h-5 w-5" />
+                Knowledge Base
+              </Link>
+              {user.isAdmin && (
+                <Link
+                  href="/dashboard/admin"
+                  className={`nav-item-zen mt-2 ${pathname === '/dashboard/admin' ? 'bg-rose-50 text-rose-600' : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'}`}
+                >
+                  <Shield className="mr-4 h-5 w-5" />
+                  Admin Console
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* User Section */}
-          <div className="pt-6 border-t border-white/5 mx-[-1.5rem] px-6">
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/5 mb-4">
+          <div className="pt-8 border-t border-slate-100">
+            <div className="flex items-center gap-4 mb-6 px-2">
               <div className={clsx(
-                "w-10 h-10 rounded-xl flex items-center justify-center text-white font-black shadow-lg",
-                user.plan === 'premium' ? "bg-gradient-to-br from-indigo-500 to-indigo-700" : "bg-slate-700"
+                "w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black shadow-inner",
+                user.plan === 'premium' ? "bg-indigo-600" : "bg-slate-200 text-slate-500"
               )}>
-                {user.plan === 'premium' ? <Star className="w-5 h-5 fill-white" /> : user.fullName.charAt(0)}
+                {user.plan === 'premium' ? <Star className="w-6 h-6 fill-white" /> : user.fullName.charAt(0)}
               </div>
               <div className="overflow-hidden">
-                <p className="text-xs font-bold text-white truncate">{user.fullName}</p>
+                <p className="text-sm font-black text-slate-900 truncate">{user.fullName}</p>
                 <p className={clsx(
                   "text-[10px] truncate font-black uppercase tracking-widest mt-0.5",
-                  user.plan === 'premium' ? "text-indigo-400" : "text-slate-500"
+                  user.plan === 'premium' ? "text-indigo-600" : "text-slate-400"
                 )}>
-                  {user.plan === 'premium' ? 'Premium Plan' : 'Free Account'}
+                  {user.plan === 'premium' ? 'Premium Protocol' : 'Basic Tier'}
                 </p>
               </div>
             </div>
             
-            {user.plan !== 'premium' && (
-              <Link 
-                href="/dashboard/family" 
-                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 transition-all mb-4 group"
-              >
-                <Zap className="w-4 h-4 fill-indigo-400 group-hover:scale-125 transition-transform" />
-                <span className="text-xs font-black uppercase tracking-widest">Upgrade Now</span>
-              </Link>
-            )}
             <button
               onClick={logout}
-              className="w-full flex items-center justify-center px-4 py-3 text-sm font-bold text-slate-400 rounded-xl hover:bg-red-500/10 hover:text-red-400 transition-all border border-transparent hover:border-red-500/20"
+              className="w-full flex items-center justify-center py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-rose-600 transition-colors"
             >
               <LogOut className="mr-3 h-4 w-4" />
               Sign Out
             </button>
-
-            {/* Temporary Debug Info - Visible to all for triage */}
-            {user && (
-              <div className="mt-8 p-3 rounded-xl bg-slate-900 border border-white/5 text-[8px] font-mono text-slate-500 overflow-hidden">
-                <p className="mb-2 font-black uppercase text-rose-500/50">System Debug</p>
-                <p>Plan: <span className="text-white">{user.plan}</span></p>
-                <p>Tenant: <span className="text-white">{user.tenantId}</span></p>
-                <p>Email: <span className="text-white">{user.email}</span></p>
-                <p>IsAdmin: <span className="text-white">{String(user.isAdmin)}</span></p>
-                <div className="mt-2 pt-2 border-t border-white/5">
-                   <p className="mb-1 text-rose-400 opacity-50">Raw User Data:</p>
-                   <pre className="whitespace-pre-wrap break-all">{JSON.stringify(user, null, 2)}</pre>
-                </div>
-                <button 
-                  onClick={() => refreshUser()}
-                  className="mt-2 w-full flex items-center justify-center gap-1 py-1 bg-white/5 hover:bg-white/10 rounded-lg text-rose-400 group-hover:text-rose-300 transition-all border border-rose-500/20"
-                >
-                  <RefreshCcw className="w-2 h-2" /> Force Refresh
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen">
+      <div className="flex-1 flex flex-col min-w-0 h-screen bg-slate-50/30">
         {/* Top Header */}
-        <header className="h-20 flex items-center justify-between px-8 border-b border-white/5 bg-slate-950/20 backdrop-blur-md sticky top-0 z-30">
-          <div className="flex items-center gap-4">
-            <button onClick={toggleSidebar} className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors">
+        <header className="h-24 flex items-center justify-between px-10 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+          <div className="flex items-center gap-6">
+            <button onClick={toggleSidebar} className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-slate-900 transition-colors">
               <Menu className="w-6 h-6" />
             </button>
-            <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/5 rounded-xl w-64 text-slate-500 focus-within:border-indigo-500/40 focus-within:text-slate-300 transition-all">
-              <Search className="w-4 h-4" />
-              <input type="text" placeholder="Search anything..." className="bg-transparent border-none outline-none text-xs flex-1" />
+            <div className="hidden md:flex items-center gap-4 px-6 py-3 bg-slate-50 border border-slate-100 rounded-2xl w-80 group focus-within:bg-white focus-within:border-indigo-200 transition-all">
+              <Search className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+              <input 
+                type="text" 
+                placeholder="Search protocols..." 
+                className="bg-transparent border-none outline-none text-sm font-medium text-slate-900 placeholder:text-slate-400 w-full" 
+                onFocus={() => {
+                  // Trigger search palette logic if needed
+                }}
+              />
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-400 hover:text-white transition-all relative group">
+          <div className="flex items-center gap-6">
+            <button className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all relative">
               <Bell className="w-5 h-5" />
-              <div className="absolute top-2.5 right-2.5 w-2 h-2 bg-indigo-500 rounded-full border-2 border-[#020617]" />
+              <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-indigo-600 rounded-full border-4 border-white" />
             </button>
-            <div className="w-[1px] h-6 bg-white/10 mx-1" />
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 line-height-1">Welcome back,</p>
-                <p className="text-xs font-bold text-white">{user.fullName.split(' ')[0]}</p>
+            <div className="w-[1px] h-8 bg-slate-100 mx-2" />
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden sm:block font-black uppercase tracking-tighter">
+                <p className="text-[9px] text-slate-400 leading-none">Ready for</p>
+                <p className="text-sm text-slate-900">{user.fullName.split(' ')[0]}</p>
               </div>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 relative overflow-y-auto overflow-x-hidden p-8 lg:p-12 bg-dashboard-radial">
+        <main className="flex-1 relative overflow-y-auto overflow-x-hidden px-10 py-12 scroll-smooth">
           {children}
         </main>
       </div>
 
-      {/* Global Mobile Navigation */}
+      {/* Mobile Navigation */}
       <MobileNav />
     </div>
   )

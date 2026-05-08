@@ -1,8 +1,30 @@
 // api/src/routes/admin.ts
 import { Hono } from 'hono'
 import { Env, Variables } from '../types'
+import { SEED_ARTICLES } from '../../lib/seed_articles'
 
 const admin = new Hono<{ Bindings: Env, Variables: Variables }>()
+...
+// ============================================================================
+// SYSTEM MAINTENANCE
+// ============================================================================
+
+admin.post('/seed-knowledge', async (c) => {
+  const db = c.env.DB
+  try {
+    for (const article of SEED_ARTICLES) {
+      await db.prepare(`
+        INSERT OR REPLACE INTO knowledge_articles (id, title, category, related_task_keywords, content_md)
+        VALUES (?, ?, ?, ?, ?)
+      `).bind(article.id, article.title, article.category, article.related_task_keywords, article.content_md.trim())
+      .run()
+    }
+    return c.json({ success: true, count: SEED_ARTICLES.length })
+  } catch (error) {
+    console.error('Seed knowledge error:', error)
+    return c.json({ error: 'Failed to seed knowledge base' }, 500)
+  }
+})
 
 // ============================================================================
 // SYSTEM STATS

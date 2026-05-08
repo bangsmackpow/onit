@@ -13,6 +13,7 @@ import invitationsRoutes from './routes/invitations'
 import mediaRoutes from './routes/media'
 import billingRoutes from './routes/billing'
 import adminRoutes from './routes/admin'
+import knowledgeRoutes from './routes/knowledge'
 import cronHandler from './services/cron'
 import { authMiddleware } from './middleware/auth'
 import { Env, Variables } from './types'
@@ -80,6 +81,7 @@ app.route('/api/invitations', invitationsRoutes)
 app.route('/api/media', mediaRoutes)
 app.route('/api/billing', billingRoutes)
 app.route('/api/admin', adminRoutes)
+app.route('/api/knowledge', knowledgeRoutes)
 
 // ============================================================================
 // CRON TRIGGERS (Cloudflare Cron)

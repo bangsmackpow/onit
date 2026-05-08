@@ -8,19 +8,18 @@ import {
   Plus, 
   CheckCircle2, 
   Calendar,
-  DollarSign,
-  Activity,
-  ArrowRight,
   Zap,
   Clock,
-  ShieldCheck,
   ChevronRight,
-  TrendingDown,
   X,
-  Settings
+  Settings,
+  BookOpen,
+  Filter,
+  AlertTriangle
 } from 'lucide-react'
 import Link from 'next/link'
 import { format, isBefore, parseISO } from 'date-fns'
+import { clsx } from 'clsx'
 
 interface Task {
   id: string
@@ -98,63 +97,52 @@ export default function TasksPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-12 pb-24">
+      <div className="max-w-6xl mx-auto space-y-12 pb-24">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
-              Maintenance <span className="text-indigo-500">Tasks</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-slate-100 pb-12">
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none">
+              Protocols<span className="text-indigo-600">.</span>
             </h1>
-            <p className="text-slate-400 text-lg font-medium max-w-lg">
-              Track and complete upcoming maintenance for your home and vehicles.
+            <p className="text-slate-400 text-xl font-medium max-w-lg leading-relaxed">
+              Standard operating procedures for your household infrastructure.
             </p>
           </div>
           <Link 
             href="/tasks/new" 
-            className="btn-premium btn-premium-primary"
+            className="btn-zen-primary h-16 px-10 text-lg shadow-2xl shadow-indigo-600/20"
           >
-            <Plus className="w-5 h-5" />
-            Add New Task
+            <Plus className="w-6 h-6" />
+            New Protocol
           </Link>
         </div>
 
         {/* Filter Bar */}
-        <div className="flex flex-wrap items-center gap-3 p-2 rounded-[2rem] glass-card w-fit border-white/5">
-          <button 
-            onClick={() => setFilter('all')}
-            className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'all' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
-          >
-            All Tasks
-          </button>
-          <button 
-            onClick={() => setFilter('overdue')}
-            className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'overdue' ? 'bg-rose-500/10 text-rose-400 shadow-sm border border-rose-500/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
-          >
-            Overdue
-          </button>
-          <button 
-            onClick={() => setFilter('upcoming')}
-            className={`px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all ${filter === 'upcoming' ? 'bg-emerald-500/10 text-emerald-400 shadow-sm border border-emerald-500/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
-          >
-            Upcoming
-          </button>
+        <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-100 rounded-[2rem] w-fit shadow-inner">
+          {(['all', 'overdue', 'upcoming'] as const).map((f) => (
+            <button 
+              key={f}
+              onClick={() => setFilter(f)}
+              className={clsx(
+                "px-8 py-3 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] transition-all",
+                filter === f ? "bg-white text-indigo-600 shadow-md" : "text-slate-400 hover:text-slate-600"
+              )}
+            >
+              {f}
+            </button>
+          ))}
         </div>
 
         {/* Tasks List */}
         {loading ? (
           <div className="space-y-6">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 glass-card animate-pulse rounded-[2.5rem]" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-slate-50 border border-slate-100 animate-pulse rounded-[2.5rem]" />)}
           </div>
         ) : filteredTasks.length === 0 ? (
-          <div className="glass-card rounded-[3rem] p-24 text-center relative overflow-hidden group">
-            <div className="glow-mesh" />
-            <div className="w-24 h-24 bg-slate-950 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-500">
-              <CheckCircle2 className="w-10 h-10 text-slate-600" />
-            </div>
-            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">All Done!</h3>
-            <p className="text-slate-400 mb-10 max-w-sm mx-auto font-medium">
-              {filter === 'all' ? 'All maintenance tasks are complete. Your home is running smoothly!' : `No pending items found for the '${filter}' filter.`}
-            </p>
+          <div className="zen-card p-32 text-center border-dashed">
+            <CheckCircle2 className="w-16 h-16 text-slate-200 mx-auto mb-8" />
+            <h3 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">System Optimized</h3>
+            <p className="text-slate-400 max-w-sm mx-auto font-medium text-lg leading-relaxed">No pending protocols found for the current filter.</p>
           </div>
         ) : (
           <div className="grid gap-6">
@@ -163,66 +151,63 @@ export default function TasksPage() {
               return (
                 <div 
                   key={task.id} 
-                  className="group glass-card p-8 rounded-[2.5rem] flex flex-col md:flex-row md:items-center gap-8 hover:border-indigo-500/30 transition-all overflow-hidden relative"
+                  className={clsx(
+                    "zen-card flex flex-col md:flex-row md:items-center justify-between gap-8 group",
+                    isOverdue && "border-rose-100 bg-rose-50/10"
+                  )}
                 >
-                  <div className={`absolute top-0 right-0 w-32 h-32 blur-[40px] -z-10 group-hover:opacity-40 transition-opacity ${isOverdue ? 'bg-rose-600/10' : 'bg-indigo-600/10'}`} />
-                  
-                  <div className={`p-5 rounded-2xl flex-shrink-0 border transition-all group-hover:scale-110 duration-500 ${isOverdue ? 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-lg shadow-rose-600/10' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-lg shadow-indigo-600/10'}`}>
-                    <Calendar className="w-8 h-8" />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-4 mb-3">
-                      <h3 className="text-2xl font-black text-white truncate group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{task.task_name}</h3>
-                      <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border ${isOverdue ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'}`}>
-                        {isOverdue ? 'Critical' : 'Pending'}
+                  <div className="flex items-center gap-8">
+                    <div className={clsx(
+                      "w-16 h-16 rounded-2xl flex items-center justify-center text-white font-black shadow-inner transition-transform group-hover:scale-110 duration-700",
+                      isOverdue ? "bg-rose-500 shadow-rose-500/20" : "bg-indigo-600 shadow-indigo-600/20"
+                    )}>
+                      {isOverdue ? <AlertTriangle className="w-8 h-8" /> : <Zap className="w-8 h-8" />}
+                    </div>
+                    
+                    <div className="min-w-0">
+                      <h3 className="text-2xl font-black text-slate-900 truncate group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-3">
+                        {task.task_name}
+                      </h3>
+                      <div className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-slate-400">
+                        <span className="text-slate-900 font-bold">{task.asset_name}</span>
+                        <span className="w-1 h-1 rounded-full bg-slate-200" />
+                        <span className={isOverdue ? "text-rose-500" : "text-slate-400"}>
+                          Due {format(parseISO(task.next_due_date), 'MMM d, yyyy')}
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-slate-200" />
+                        <span>{task.recurrence_type}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-slate-700" />
-                        <span className="uppercase tracking-widest">{task.asset_name}</span>
-                      </div>
-                      <div className="w-[1px] h-3 bg-white/10" />
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-slate-700" />
-                        <span className="uppercase tracking-widest">{task.recurrence_type}</span>
-                      </div>
-                    </div>
-                    {task.description && <p className="text-sm font-medium text-slate-500 mt-4 line-clamp-1 max-w-2xl">{task.description}</p>}
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4">
-                    <div className="text-right flex-shrink-0 mr-4">
-                      <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`}>Due Date</p>
-                      <p className={`text-xl font-black ${isOverdue ? 'text-rose-400' : 'text-white'}`}>
-                        {format(parseISO(task.next_due_date), 'MMM d, yyyy')}
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <Link 
+                      href={`/knowledge/search?q=${task.task_name}`} // Dynamic guide search
+                      className="btn-zen-secondary px-6 h-14"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      Guide
+                    </Link>
                     
                     <Link 
                       href={`/tasks/edit?id=${task.id}`}
-                      className="p-4 rounded-2xl bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
-                      title="Edit Protocol"
+                      className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm"
                     >
                       <Settings className="w-5 h-5" />
                     </Link>
 
                     <button 
                       onClick={() => setSnoozingTaskId(task.id)}
-                      className="p-4 rounded-2xl bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
-                      title="Snooze Reminder"
+                      className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm"
                     >
                       <Clock className="w-5 h-5" />
                     </button>
 
                     <button 
                       onClick={() => setCompletingTaskId(task.id)}
-                      className="btn-premium btn-premium-secondary group/btn border-indigo-500/30"
+                      className="btn-zen-primary h-14 px-8"
                     >
-                      <CheckCircle2 className="w-5 h-5 text-indigo-500 group-hover/btn:text-white" />
                       Complete
-                      <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -234,117 +219,96 @@ export default function TasksPage() {
 
       {/* Snooze Modal */}
       {snoozingTaskId && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 sm:p-12 transition-all duration-500">
-          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl animate-in fade-in duration-500" onClick={() => setSnoozingTaskId(null)}></div>
-          <div className="relative glass-card w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500 border-white/10">
-            <div className="p-10 text-center">
-              <Clock className="w-12 h-12 text-indigo-500 mx-auto mb-6" />
-              <h2 className="text-2xl font-black text-white mb-2">Snooze Reminder</h2>
-              <p className="text-slate-400 text-sm font-medium mb-8">Postpone this notification for a few days.</p>
-              
-              <div className="grid gap-3">
-                {[3, 7, 14].map(days => (
-                  <button
-                    key={days}
-                    onClick={() => handleSnooze(days)}
-                    className="w-full py-4 rounded-2xl bg-white/5 border border-white/5 text-white font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-600 hover:border-indigo-500 transition-all"
-                  >
-                    Snooze {days} Days
-                  </button>
-                ))}
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-8">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setSnoozingTaskId(null)}></div>
+          <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 border border-slate-100 p-12 text-center">
+            <Clock className="w-16 h-16 text-indigo-600 mx-auto mb-8 animate-float" />
+            <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Pause Protocol</h2>
+            <p className="text-slate-400 font-medium text-lg mb-10 leading-relaxed">Choose a resynchronization window.</p>
+            
+            <div className="grid gap-4">
+              {[3, 7, 14].map(days => (
                 <button
-                  onClick={() => setSnoozingTaskId(null)}
-                  className="mt-4 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors"
+                  key={days}
+                  onClick={() => handleSnooze(days)}
+                  className="btn-zen-secondary h-16 text-slate-900 border-slate-100 hover:border-indigo-600 hover:text-indigo-600"
                 >
-                  Cancel
+                  Snooze {days} Days
                 </button>
-              </div>
+              ))}
+              <button
+                onClick={() => setSnoozingTaskId(null)}
+                className="mt-6 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors"
+              >
+                Dismiss
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Completion Modal */}
+      {/* Completion Modal - Zen Style */}
       {completingTaskId && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 sm:p-12 transition-all duration-500">
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-500" onClick={() => setCompletingTaskId(null)}></div>
-          <div className="relative glass-card w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500 border-white/10">
-            <div className="glow-mesh" />
-            
-            <div className="p-10 md:p-16 relative z-10">
-              <div className="flex items-center justify-between mb-12">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/30">
-                    <ShieldCheck className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight">Task Completion</h2>
-                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Record Household Maintenance</p>
-                  </div>
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-8">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setCompletingTaskId(null)}></div>
+          <div className="relative bg-white w-full max-w-2xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 border border-slate-100">
+            <div className="p-12 md:p-16 space-y-12">
+              <div className="text-center space-y-4">
+                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-emerald-100">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                 </div>
-                <button onClick={() => setCompletingTaskId(null)} className="p-3 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl transition-all">
-                  <X className="w-6 h-6" />
-                </button>
+                <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-none uppercase">Archive Protocol</h2>
+                <p className="text-slate-400 text-lg font-medium">Document the execution details for the record.</p>
               </div>
 
               <form onSubmit={handleComplete} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-6">Final Metric (Mileage/Usage)</label>
+                    <input 
+                      type="number"
+                      className="input-zen h-16"
+                      placeholder="e.g. 52000"
+                      value={completionData.mileage}
+                      onChange={(e) => setCompletionData({...completionData, mileage: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-6">Execution Cost (USD)</label>
+                    <input 
+                      type="number"
+                      className="input-zen h-16"
+                      placeholder="0.00"
+                      value={completionData.costUsd}
+                      onChange={(e) => setCompletionData({...completionData, costUsd: e.target.value})}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
-                    <Zap className="w-3 h-3" />
-                    Completion Notes
-                  </label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-6">Notes & Findings</label>
                   <textarea 
+                    className="input-zen py-6"
+                    rows={4}
+                    placeholder="Document parts used or anomalies observed..."
                     value={completionData.notes}
                     onChange={(e) => setCompletionData({...completionData, notes: e.target.value})}
-                    placeholder="What was done? (e.g., changed oil, replaced filter...)"
-                    className="input-premium py-5 px-6"
-                    rows={4}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
-                      <TrendingDown className="w-3 h-3" />
-                      Usage Metrics
-                    </label>
-                    <div className="relative group/input">
-                      <Activity className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-indigo-400 transition-colors" />
-                      <input 
-                        type="number"
-                        value={completionData.mileage}
-                        onChange={(e) => setCompletionData({...completionData, mileage: e.target.value})}
-                        placeholder="Current Mileage"
-                        className="input-premium pl-14 h-16"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-5 flex items-center gap-2">
-                      <DollarSign className="w-3 h-3" />
-                      Cost
-                    </label>
-                    <div className="relative group/input">
-                      <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-indigo-400 transition-colors" />
-                      <input 
-                        type="number"
-                        step="0.01"
-                        value={completionData.costUsd}
-                        onChange={(e) => setCompletionData({...completionData, costUsd: e.target.value})}
-                        placeholder="Total Cost (USD)"
-                        className="input-premium pl-14 h-16"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-8">
+                <div className="pt-8 flex flex-col md:flex-row gap-4">
                   <button 
                     type="submit"
-                    className="btn-premium btn-premium-primary w-full h-[72px] text-lg shadow-2xl group/sub"
+                    className="btn-zen-primary flex-1 h-18 text-lg shadow-emerald-500/10"
                   >
-                    Save Completion
-                    <ArrowRight className="w-6 h-6 group-hover/sub:translate-x-1 transition-transform" />
+                    Commit Execution
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setCompletingTaskId(null)}
+                    className="btn-zen-secondary h-18 px-10"
+                  >
+                    Cancel
                   </button>
                 </div>
               </form>

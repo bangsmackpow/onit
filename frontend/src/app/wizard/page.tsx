@@ -1,3 +1,4 @@
+// frontend/src/app/wizard/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -12,350 +13,189 @@ import {
   ShieldCheck,
   Zap,
   Droplets,
-  Thermometer,
-  Waves
+  Wind,
+  Settings,
+  X,
+  LifeBuoy
 } from 'lucide-react'
+import { apiGet, apiPost } from '@/lib/apiClient'
+import { ASSET_TEMPLATES } from '@/lib/templates'
 import { clsx } from 'clsx'
-import { useAuthStore } from '@/store/authStore'
-import { apiPost } from '@/lib/apiClient'
+import Logo from '@/components/Logo'
 
-type WizardStep = 1 | 2 | 3 | 4 | 5
-
-interface AssetOption {
-  id: string
-  name: string
-  icon: React.ReactNode
-  category: 'house' | 'car' | 'appliance'
-  defaultTasks: { name: string; frequency: 'monthly' | 'quarterly' | 'annual' | 'biannual'; description: string }[]
-}
-
-const ASSET_OPTIONS: AssetOption[] = [
-  {
-    id: 'hvac',
-    name: 'HVAC / AC System',
-    icon: <Thermometer className="w-5 h-5" />,
-    category: 'house',
-    defaultTasks: [
-      { name: 'Change Air Filter', frequency: 'quarterly', description: 'Replace the main HVAC return air filter.' },
-      { name: 'Annual Inspection', frequency: 'annual', description: 'Schedule professional maintenance.' }
-    ]
-  },
-  {
-    id: 'water_heater',
-    name: 'Water Heater',
-    icon: <Droplets className="w-5 h-5" />,
-    category: 'house',
-    defaultTasks: [
-      { name: 'Flush Tank', frequency: 'annual', description: 'Remove sediment buildup from the tank.' }
-    ]
-  },
-  {
-    id: 'washer',
-    name: 'Washing Machine',
-    icon: <Waves className="w-5 h-5" />,
-    category: 'appliance',
-    defaultTasks: [
-      { name: 'Clean Drum', frequency: 'monthly', description: 'Run a cleaning cycle.' }
-    ]
-  },
-  {
-    id: 'car_main',
-    name: 'Primary Vehicle',
-    icon: <Car className="w-5 h-5" />,
-    category: 'car',
-    defaultTasks: [
-      { name: 'Oil Change', frequency: 'biannual', description: 'Check and replace engine oil.' },
-      { name: 'Tire Rotation', frequency: 'biannual', description: 'Rotate tires to ensure even wear.' }
-    ]
-  },
-  {
-    id: 'roof',
-    name: 'Roof & Gutters',
-    icon: <ShieldCheck className="w-5 h-5" />,
-    category: 'house',
-    defaultTasks: [
-      { name: 'Clean Gutters', frequency: 'biannual', description: 'Remove leaves and debris.' }
-    ]
-  }
-]
+type Step = 'welcome' | 'assets' | 'tasks' | 'complete'
 
 export default function OnboardingWizard() {
   const router = useRouter()
-  const { token, user } = useAuthStore()
-  const [step, setStep] = useState<WizardStep>(1)
-  const [selectedAssets, setSelectedAssets] = useState<string[]>([])
-  const [propertyType, setPropertyType] = useState<string>('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [step, setStep] = useState<Step>('welcome')
+  const [selectedTemplates, setSelectedTemplates] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: any) => {
-      e.preventDefault()
-      setDeferredPrompt(e)
+  const toggleTemplate = (name: string) => {
+    if (selectedTemplates.includes(name)) {
+      setSelectedTemplates(selectedTemplates.filter(t => t !== name))
+    } else {
+      setSelectedTemplates([...selectedTemplates, name])
     }
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-  }, [])
-
-  const handleInstall = async () => {
-    if (!deferredPrompt) return
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null)
-    }
-  }
-
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!token) router.push('/login')
-  }, [token, router])
-
-  const toggleAsset = (id: string) => {
-    setSelectedAssets(prev => 
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
-    )
   }
 
   const handleFinish = async () => {
-    setIsSubmitting(true)
+    setLoading(true)
     try {
       // Create selected assets and their default tasks
-      for (const assetId of selectedAssets) {
-        const option = ASSET_OPTIONS.find(a => a.id === assetId)
-        if (!option) continue
+      for (const tplName of selectedTemplates) {
+        const tpl = ASSET_TEMPLATES.find(t => t.name === tplName)
+        if (!tpl) continue
 
-        const assetResponse = await apiPost('/api/assets', {
-          name: option.name,
-          assetType: option.category,
-          description: `Onboarded ${option.name} for ${propertyType}`
+        const assetRes = await apiPost('/api/assets', {
+          name: tpl.name,
+          assetType: tpl.type,
+          description: `Initialized via onboarding protocol.`
         })
 
-        const createdAsset = assetResponse.data.asset
-        
-        // Add default tasks
-        for (const task of option.defaultTasks) {
+        const assetId = assetRes.data.asset.id
+
+        for (const task of tpl.defaultTasks) {
           await apiPost('/api/tasks', {
-            assetId: createdAsset.id,
+            assetId,
             taskName: task.name,
             description: task.description,
+            recurrenceType: task.recurrenceType,
+            recurrenceInterval: task.recurrenceInterval,
+            reminderDaysBefore: task.reminderDaysBefore,
+            nextDueDate: new Date().toISOString().split('T')[0], // Start today
             assignmentType: 'single',
-            assignedToUserIds: [user?.id],
-            recurrenceType: task.frequency,
-            nextDueDate: new Date().toISOString()
+            assignedToUserIds: []
           })
         }
       }
-
-      router.push('/dashboard')
-    } catch (error) {
-      console.error('Error during onboarding:', error)
-      setIsSubmitting(false)
+      setStep('complete')
+    } catch (err) {
+      console.error('Onboarding failed', err)
+      alert('Failed to complete onboarding. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
   const renderStep = () => {
     switch (step) {
-      case 1:
+      case 'welcome':
         return (
-          <div className="space-y-6 text-center py-8">
-            <div className="mx-auto w-24 h-24 bg-blue-500/10 rounded-3xl flex items-center justify-center border border-blue-500/20 mb-6">
-              <Home className="w-12 h-12 text-blue-400" />
+          <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 text-center">
+            <div className="space-y-6">
+              <div className="flex justify-center mb-8">
+                <Logo size="lg" />
+              </div>
+              <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter leading-none">
+                Begin <span className="text-indigo-600 text-outline">Clarity.</span>
+              </h1>
+              <p className="text-slate-400 text-2xl font-medium max-w-xl mx-auto leading-relaxed">
+                Welcome to your new household standard. Let's synchronize your infrastructure in three simple steps.
+              </p>
             </div>
-            <h1 className="text-3xl font-bold font-outfit text-white">Let's Get Organized</h1>
-            <p className="text-slate-400 max-w-sm mx-auto">
-              Welcome to ONIT. We'll help you set up your household maintenance schedule in less than 2 minutes.
-            </p>
-            <button
-              onClick={() => setStep(2)}
-              className="mt-8 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-semibold shadow-xl shadow-blue-900/20 transition-all flex items-center justify-center gap-2 mx-auto w-full max-w-xs"
+            <button 
+              onClick={() => setStep('assets')}
+              className="btn-zen-primary h-20 px-12 text-xl shadow-2xl shadow-indigo-600/20 mx-auto"
             >
-              Get Started <ChevronRight className="w-5 h-5" />
+              Start Synchronization
+              <ArrowRight className="w-6 h-6" />
             </button>
           </div>
         )
 
-      case 2:
+      case 'assets':
         return (
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white">What type of property?</h2>
-              <p className="text-slate-400">This helps us recommend the right maintenance.</p>
+          <div className="space-y-12 animate-in fade-in slide-in-from-right-8 duration-700">
+            <div className="text-center space-y-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600">Step 01 / 02</span>
+              <h2 className="text-5xl font-black text-slate-900 tracking-tight">Identify Your <span className="text-indigo-600">Inventory</span></h2>
+              <p className="text-slate-400 text-lg font-medium">Select the systems you wish to monitor.</p>
             </div>
-            <div className="grid grid-cols-1 gap-4">
-              {['Single Family House', 'Apartment / Condo', 'Rental Unit', 'Townhouse'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => {
-                    setPropertyType(type)
-                    setStep(3)
-                  }}
-                  className={clsx(
-                    "p-5 text-left rounded-2xl border-2 transition-all group flex items-center justify-between",
-                    propertyType === type 
-                      ? "border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/20" 
-                      : "border-slate-800 bg-slate-900/50 hover:border-slate-700"
-                  )}
-                >
-                  <span className="font-semibold text-white">{type}</span>
-                  <ArrowRight className={clsx(
-                    "w-5 h-5 transition-all text-slate-500 group-hover:text-blue-400",
-                    propertyType === type && "translate-x-1"
-                  )} />
-                </button>
-              ))}
-            </div>
-          </div>
-        )
 
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white">What do you own?</h2>
-              <p className="text-slate-400">Select everything that needs maintenance.</p>
-            </div>
-            <div className="grid grid-cols-1 gap-3">
-              {ASSET_OPTIONS.map((asset) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {ASSET_TEMPLATES.map((tpl) => (
                 <button
-                  key={asset.id}
-                  onClick={() => toggleAsset(asset.id)}
+                  key={tpl.name}
+                  onClick={() => toggleTemplate(tpl.name)}
                   className={clsx(
-                    "p-4 text-left rounded-2xl border-2 transition-all flex items-center gap-4",
-                    selectedAssets.includes(asset.id)
-                      ? "border-blue-500 bg-blue-500/10"
-                      : "border-slate-800 bg-slate-900/50"
+                    "zen-card flex items-center gap-6 text-left group transition-all duration-500",
+                    selectedTemplates.includes(tpl.name) 
+                      ? "border-indigo-600 bg-indigo-50/30 shadow-xl" 
+                      : "hover:border-slate-300"
                   )}
                 >
                   <div className={clsx(
-                    "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                    selectedAssets.includes(asset.id) ? "bg-blue-500 text-white" : "bg-slate-800 text-slate-500"
+                    "w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-inner transition-transform group-hover:scale-110 duration-700",
+                    selectedTemplates.includes(tpl.name) ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
                   )}>
-                    {asset.icon}
+                    {tpl.icon}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-white">{asset.name}</p>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">{asset.category}</p>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">{tpl.name}</h3>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{tpl.defaultTasks.length} Automated Protocols</p>
                   </div>
-                  {selectedAssets.includes(asset.id) && <CheckCircle2 className="w-6 h-6 text-blue-500" />}
+                  {selectedTemplates.includes(tpl.name) && (
+                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center animate-in zoom-in duration-300">
+                      <CheckCircle2 className="w-5 h-5 text-white" />
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
-            <div className="pt-4 flex gap-4">
-              <button onClick={() => setStep(2)} className="flex-1 py-4 text-slate-400 font-semibold rounded-2xl hover:bg-white/5 transition-colors">Back</button>
-              <button 
-                onClick={() => setStep(4)} 
-                disabled={selectedAssets.length === 0}
-                className="flex-[2] py-4 bg-blue-600 disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-blue-900/20"
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        )
 
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="space-y-2 text-center">
-              <div className="mx-auto w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20 mb-4">
-                <Calendar className="w-8 h-8 text-emerald-400" />
-              </div>
-              <h2 className="text-2xl font-bold text-white">Scheduling Intent</h2>
-              <p className="text-slate-400 px-4">Based on your selections, we will generate {selectedAssets.reduce((acc, curr) => acc + (ASSET_OPTIONS.find(a => a.id === curr)?.defaultTasks.length || 0), 0)} recurring tasks.</p>
-            </div>
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-blue-400 mt-1" />
-                <div>
-                  <p className="font-semibold text-white">Daily Digest Strategy</p>
-                  <p className="text-sm text-slate-500">We'll send you one email at 9:00 AM ONLY when things need attention.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-blue-400 mt-1" />
-                <div>
-                  <p className="font-semibold text-white">Intelligent Intervals</p>
-                  <p className="text-sm text-slate-500">Filters every 3 months, tank flush annually, etc. All customizable later.</p>
-                </div>
-              </div>
-            </div>
-            <div className="pt-4 flex gap-4">
-              <button onClick={() => setStep(3)} className="flex-1 py-4 text-slate-400 font-semibold rounded-2xl hover:bg-white/5 transition-colors">Back</button>
+            <div className="flex justify-center pt-8">
               <button 
-                onClick={() => setStep(5)} 
-                className="flex-[2] py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-900/20"
-              >
-                Almost Done
-              </button>
-            </div>
-          </div>
-        )
-
-      case 5:
-        return (
-          <div className="space-y-6 text-center py-8">
-            <div className="mx-auto w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20 mb-6 animate-pulse">
-              <ShieldCheck className="w-12 h-12 text-emerald-400" />
-            </div>
-            <h2 className="text-3xl font-bold font-outfit text-white">Ready to Roll?</h2>
-            <p className="text-slate-400 max-w-sm mx-auto">
-              We'll populate your dashboard with your new assets and schedule. You can add more specifically at any time.
-            </p>
-            <div className="mt-8 space-y-3">
-              <button
+                disabled={selectedTemplates.length === 0}
                 onClick={handleFinish}
-                disabled={isSubmitting}
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold shadow-xl shadow-blue-900/20 transition-all w-full max-w-xs disabled:opacity-50"
+                className="btn-zen-primary h-20 px-12 text-xl disabled:opacity-30 disabled:grayscale transition-all shadow-2xl shadow-indigo-600/20"
               >
-                {isSubmitting ? 'Finalizing...' : 'Take me to my Dashboard'}
+                {loading ? 'Processing Neural Grid...' : 'Finalize Selection'}
+                <ChevronRight className="w-6 h-6" />
               </button>
-              
-              {deferredPrompt && (
-                <button
-                  onClick={handleInstall}
-                  className="flex items-center justify-center gap-2 px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-semibold transition-all w-full max-w-xs mx-auto border border-white/10"
-                >
-                  <Zap className="w-4 h-4 text-amber-400" />
-                  Install App to Home Screen
-                </button>
-              )}
-
-              <p className="text-xs text-slate-500 italic">By clicking, you agree to receive maintenance reminders.</p>
             </div>
+          </div>
+        )
+
+      case 'complete':
+        return (
+          <div className="space-y-12 animate-in fade-in zoom-in duration-1000 text-center max-w-2xl mx-auto">
+            <div className="w-32 h-32 bg-emerald-50 rounded-[3rem] flex items-center justify-center mx-auto mb-10 border border-emerald-100 shadow-xl shadow-emerald-500/5 animate-float">
+              <CheckCircle2 className="w-16 h-16 text-emerald-500" />
+            </div>
+            <div className="space-y-6">
+              <h2 className="text-6xl font-black text-slate-900 tracking-tighter leading-none">
+                System <span className="text-emerald-500">Live.</span>
+              </h2>
+              <p className="text-slate-400 text-xl font-medium leading-relaxed">
+                Your household infrastructure is now synchronized. Maintenance protocols have been established and scheduled.
+              </p>
+            </div>
+            <button 
+              onClick={() => router.push('/dashboard')}
+              className="btn-zen-primary h-20 px-12 text-xl bg-slate-900 mx-auto"
+            >
+              Enter Dashboard
+            </button>
           </div>
         )
     }
   }
 
   return (
-    <main className="min-h-screen relative flex items-center justify-center px-6 py-12">
-      {/* Background Decor */}
-      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full" />
-      <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-indigo-600/10 blur-[100px] rounded-full" />
+    <main className="min-h-screen bg-white selection:bg-indigo-100">
+      {/* Zen Background Pattern */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:40px_40px]" />
+      </div>
 
-      <div className="w-full max-w-lg z-10">
-        {/* Progress Bar */}
-        <div className="flex justify-between mb-8 gap-2">
-          {[1, 2, 3, 4, 5].map((s) => (
-            <div 
-              key={s} 
-              className={clsx(
-                "h-1.5 flex-1 rounded-full transition-all duration-500",
-                step >= s ? "bg-blue-500" : "bg-slate-800"
-              )} 
-            />
-          ))}
-        </div>
-
-        <div className="bg-slate-950/50 backdrop-blur-xl border border-white/5 rounded-[40px] p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.03] to-transparent pointer-events-none" />
-          
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-32">
+        <div className="relative min-h-[600px] flex items-center justify-center">
           {renderStep()}
         </div>
 
-        <p className="mt-8 text-center text-slate-500 text-sm">
-          Secured with family-grade encryption
+        <p className="mt-20 text-center text-slate-300 text-xs font-black uppercase tracking-[0.4em]">
+          Powered by Household Intelligence Protocol v2.0
         </p>
       </div>
     </main>
