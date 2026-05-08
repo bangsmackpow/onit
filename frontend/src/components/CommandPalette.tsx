@@ -8,7 +8,6 @@ import {
   CheckSquare, 
   ArrowRight,
   Command,
-  X,
   Zap,
   BookOpen,
   LifeBuoy

@@ -13,7 +13,6 @@ import {
   CheckCircle2
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import Link from 'next/link'
 
 interface Article {
   id: string

@@ -7,14 +7,10 @@ import { apiGet, apiPost } from '@/lib/apiClient'
 import { 
   Plus, 
   CheckCircle2, 
-  Calendar,
   Zap,
   Clock,
-  ChevronRight,
-  X,
   Settings,
   BookOpen,
-  Filter,
   AlertTriangle
 } from 'lucide-react'
 import Link from 'next/link'

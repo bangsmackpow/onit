@@ -1,7 +1,6 @@
 // frontend/src/server/routes/knowledge.ts
 import { Hono } from 'hono'
 import { Env, Variables } from '../types'
-import { nanoid } from 'nanoid'
 
 const knowledge = new Hono<{ Bindings: Env, Variables: Variables }>()
 

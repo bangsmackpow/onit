@@ -6,11 +6,7 @@ import { apiGet } from '@/lib/apiClient'
 import { 
   BookOpen, 
   Search, 
-  ChevronRight, 
-  Filter,
-  Zap,
   ArrowRight,
-  ShieldCheck,
   LifeBuoy
 } from 'lucide-react'
 import Link from 'next/link'

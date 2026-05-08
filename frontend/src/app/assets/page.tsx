@@ -3,15 +3,12 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
-import { apiGet, apiDelete } from '@/lib/apiClient'
+import { apiGet } from '@/lib/apiClient'
 import { 
   Plus, 
   Car, 
   Home, 
   Zap, 
-  Settings, 
-  ArrowRight,
-  Trash2,
   Package,
   ShieldCheck,
   ChevronRight

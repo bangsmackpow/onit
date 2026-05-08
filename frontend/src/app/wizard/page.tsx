@@ -1,24 +1,14 @@
 // frontend/src/app/wizard/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  Home, 
-  Car, 
-  Calendar, 
   CheckCircle2, 
   ChevronRight, 
-  ArrowRight,
-  ShieldCheck,
-  Zap,
-  Droplets,
-  Wind,
-  Settings,
-  X,
-  LifeBuoy
+  ArrowRight
 } from 'lucide-react'
-import { apiGet, apiPost } from '@/lib/apiClient'
+import { apiPost } from '@/lib/apiClient'
 import { ASSET_TEMPLATES } from '@/lib/templates'
 import { clsx } from 'clsx'
 import Logo from '@/components/Logo'

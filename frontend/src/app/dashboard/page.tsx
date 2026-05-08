@@ -7,22 +7,16 @@ import PushNotificationManager from '@/components/PushNotificationManager'
 import { apiGet } from '@/lib/apiClient'
 import { 
   Plus, 
-  Clock, 
   CheckCircle2, 
   AlertTriangle, 
-  Calendar,
-  ChevronRight,
   ArrowRight,
-  Zap,
   ShieldCheck,
-  TrendingUp,
   LayoutDashboard,
   Timer as TimerIcon,
-  Package,
   BookOpen
 } from 'lucide-react'
 import Link from 'next/link'
-import { format, isBefore, addDays, parseISO, isToday } from 'date-fns'
+import { format, isBefore, parseISO } from 'date-fns'
 import { clsx } from 'clsx'
 
 interface Task {

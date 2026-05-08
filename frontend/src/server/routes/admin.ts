@@ -4,7 +4,7 @@ import { Env, Variables } from '../types'
 import { SEED_ARTICLES } from '../../lib/seed_articles'
 
 const admin = new Hono<{ Bindings: Env, Variables: Variables }>()
-...
+
 // ============================================================================
 // SYSTEM MAINTENANCE
 // ============================================================================
