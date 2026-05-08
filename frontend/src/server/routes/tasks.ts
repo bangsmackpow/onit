@@ -11,7 +11,7 @@ const CreateTaskSchema = z.object({
   taskName: z.string().min(1).max(200),
   description: z.string().max(500).optional(),
   assignmentType: z.enum(['single', 'shared']),
-  assignedToUserIds: z.array(z.string()).min(1), // at least one user
+  assignedToUserIds: z.array(z.string()).optional().default([]),
   reminderDaysBefore: z.number().int().min(0).default(7),
   recurrenceType: z.enum(['once', 'monthly', 'quarterly', 'biannual', 'annual']),
   recurrenceInterval: z.number().int().min(1).optional(),
@@ -155,6 +155,12 @@ tasks.post('/', async (c) => {
       return c.json({ error: 'Asset not found or unauthorized' }, 404)
     }
 
+    // Determine assignments
+    let assignedUserIds = validated.assignedToUserIds
+    if (assignedUserIds.length === 0) {
+      assignedUserIds = [userId] // Auto-assign to creator
+    }
+
     // Begin transaction
     await db.prepare('BEGIN TRANSACTION').run()
 
@@ -183,7 +189,7 @@ tasks.post('/', async (c) => {
         .run()
 
       // Insert task assignments
-      for (const assignedUserId of validated.assignedToUserIds) {
+      for (const assignedUserId of assignedUserIds) {
         await db
           .prepare(
             'INSERT INTO task_assignments (id, task_id, tenant_id, assigned_to_user_id, assigned_at) VALUES (?, ?, ?, ?, datetime("now"))'

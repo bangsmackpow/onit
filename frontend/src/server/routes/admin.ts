@@ -11,9 +11,11 @@ const admin = new Hono<{ Bindings: Env, Variables: Variables }>()
 
 admin.post('/seed-knowledge', async (c) => {
   const db = c.env.DB
+  console.log('Seeding knowledge base initiated...')
+  
   try {
-    // Ensure table exists (fail-safe for production)
-    await db.prepare(`
+    // 1. Defensively ensure table exists
+    const tableResult = await db.prepare(`
       CREATE TABLE IF NOT EXISTS knowledge_articles (
         id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
@@ -24,18 +26,34 @@ admin.post('/seed-knowledge', async (c) => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `).run()
+    console.log('Table creation check complete', tableResult)
 
+    // 2. Perform insertions
+    let seededCount = 0
     for (const article of SEED_ARTICLES) {
+      console.log(`Seeding article: ${article.title}`)
       await db.prepare(`
         INSERT OR REPLACE INTO knowledge_articles (id, title, category, related_task_keywords, content_md)
         VALUES (?, ?, ?, ?, ?)
-      `).bind(article.id, article.title, article.category, article.related_task_keywords, article.content_md.trim())
-      .run()
+      `).bind(
+        article.id, 
+        article.title, 
+        article.category, 
+        article.related_task_keywords, 
+        article.content_md.trim()
+      ).run()
+      seededCount++
     }
-    return c.json({ success: true, count: SEED_ARTICLES.length })
-  } catch (error) {
-    console.error('Seed knowledge error:', error)
-    return c.json({ error: 'Failed to seed knowledge base', details: String(error) }, 500)
+    
+    console.log(`Seeding successful: ${seededCount} articles.`)
+    return c.json({ success: true, count: seededCount })
+  } catch (error: any) {
+    console.error('CRITICAL SEED ERROR:', error)
+    return c.json({ 
+      error: 'Failed to seed knowledge base', 
+      details: error.message,
+      stack: error.stack 
+    }, 500)
   }
 })
 
