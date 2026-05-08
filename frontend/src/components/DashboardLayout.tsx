@@ -140,6 +140,10 @@ export default function DashboardLayout({ children }: Props) {
                 )}>
                   {user.plan === 'premium' ? 'Premium Protocol' : 'Basic Tier'}
                 </p>
+                {/* Temporary Admin Debug */}
+                <p className="text-[8px] font-mono text-slate-300 mt-1 uppercase tracking-tighter">
+                  {user.email} • Admin: {user.isAdmin ? 'TRUE' : 'FALSE'}
+                </p>
               </div>
             </div>
             

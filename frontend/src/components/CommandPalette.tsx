@@ -61,22 +61,28 @@ export default function CommandPalette() {
         ])
 
         const assets = (assetsRes.data.assets || [])
-          .filter((a: any) => a.name.toLowerCase().includes(query.toLowerCase()))
+          .filter((a: any) => 
+            a.name.toLowerCase().includes(query.toLowerCase()) || 
+            (a.city && a.city.toLowerCase().includes(query.toLowerCase()))
+          )
           .map((a: any) => ({
             id: a.id,
             type: 'asset',
             title: a.name,
-            subtitle: `Asset • ${a.asset_type}`,
+            subtitle: `Asset • ${a.asset_type}${a.city ? ` • ${a.city}` : ''}`,
             url: `/assets/detail?id=${a.id}`
           }))
 
         const tasks = (tasksRes.data.tasks || [])
-          .filter((t: any) => t.task_name.toLowerCase().includes(query.toLowerCase()))
+          .filter((t: any) => 
+            t.task_name.toLowerCase().includes(query.toLowerCase()) ||
+            t.next_due_date.includes(query)
+          )
           .map((t: any) => ({
             id: t.id,
             type: 'task',
             title: t.task_name,
-            subtitle: `Protocol • ${t.asset_name}`,
+            subtitle: `Protocol • ${t.asset_name} • Due ${t.next_due_date.split('T')[0]}`,
             url: `/tasks`
           }))
 

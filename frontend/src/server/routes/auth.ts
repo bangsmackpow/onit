@@ -173,6 +173,9 @@ auth.get('/me', authMiddleware, async (c) => {
       return c.json({ error: 'User not found' }, 404)
     }
 
+    const isAdmin = !!res.is_system_admin || res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
+    console.log(`User ${res.email} check: system_admin=${res.is_system_admin}, env_admin=${c.env.ADMIN_EMAIL}, result=${isAdmin}`)
+
     return c.json({
       user: {
         id: res.id,
@@ -182,8 +185,8 @@ auth.get('/me', authMiddleware, async (c) => {
         isOwner: !!res.is_owner,
         tenantName: res.tenant_name,
         plan: res.plan?.toLowerCase().trim() || 'free',
-        isAdmin: !!res.is_system_admin || res.email === (c.env.ADMIN_EMAIL || 'curtis@example.com')
-      },
+        isAdmin
+      }
     })
   } catch (error) {
     console.error('Me error:', error)

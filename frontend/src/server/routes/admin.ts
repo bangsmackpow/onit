@@ -12,6 +12,19 @@ const admin = new Hono<{ Bindings: Env, Variables: Variables }>()
 admin.post('/seed-knowledge', async (c) => {
   const db = c.env.DB
   try {
+    // Ensure table exists (fail-safe for production)
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS knowledge_articles (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        category TEXT NOT NULL,
+        content_md TEXT NOT NULL,
+        related_task_keywords TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run()
+
     for (const article of SEED_ARTICLES) {
       await db.prepare(`
         INSERT OR REPLACE INTO knowledge_articles (id, title, category, related_task_keywords, content_md)
@@ -22,7 +35,7 @@ admin.post('/seed-knowledge', async (c) => {
     return c.json({ success: true, count: SEED_ARTICLES.length })
   } catch (error) {
     console.error('Seed knowledge error:', error)
-    return c.json({ error: 'Failed to seed knowledge base' }, 500)
+    return c.json({ error: 'Failed to seed knowledge base', details: String(error) }, 500)
   }
 })
 

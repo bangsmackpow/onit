@@ -10,12 +10,14 @@ const CreateAssetSchema = z.object({
   name: z.string().min(1).max(200),
   assetType: z.enum(['car', 'house', 'appliance']),
   description: z.string().max(500).optional(),
+  city: z.string().max(100).optional(),
 })
 
 const UpdateAssetSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   assetType: z.enum(['car', 'house', 'appliance']).optional(),
   description: z.string().max(500).optional(),
+  city: z.string().max(100).optional(),
 })
 
 // ============================================================================
@@ -87,9 +89,9 @@ assets.post('/', async (c) => {
 
     await db
       .prepare(
-        'INSERT INTO assets (id, tenant_id, name, asset_type, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, datetime("now"), datetime("now"))'
+        'INSERT INTO assets (id, tenant_id, name, asset_type, description, city, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, datetime("now"), datetime("now"))'
       )
-      .bind(assetId, tenantId, validated.name, validated.assetType, validated.description || null)
+      .bind(assetId, tenantId, validated.name, validated.assetType, validated.description || null, validated.city || null)
       .run()
 
     const newAsset = await db
@@ -144,6 +146,10 @@ assets.put('/:id', async (c) => {
     if (validated.description !== undefined) {
       updates.push('description = ?')
       values.push(validated.description)
+    }
+    if (validated.city !== undefined) {
+      updates.push('city = ?')
+      values.push(validated.city)
     }
 
     updates.push('updated_at = datetime("now")')

@@ -13,7 +13,8 @@ import {
   Home,
   Zap,
   Cpu,
-  Database
+  Database,
+  MapPin
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,6 +30,7 @@ function EditAssetForm() {
     name: '',
     assetType: 'car' as 'car' | 'house' | 'appliance',
     description: '',
+    city: '',
   })
 
   useEffect(() => {
@@ -41,6 +43,7 @@ function EditAssetForm() {
           name: asset.name,
           assetType: asset.asset_type,
           description: asset.description || '',
+          city: asset.city || '',
         })
       } catch (err) {
         console.error('Failed to fetch asset', err)
@@ -61,7 +64,8 @@ function EditAssetForm() {
       await apiPut(`/api/assets/${id}`, {
         name: formData.name,
         assetType: formData.assetType,
-        description: formData.description
+        description: formData.description,
+        city: formData.city
       })
       router.push(`/assets/detail?id=${id}`)
     } catch (err: any) {
@@ -74,7 +78,6 @@ function EditAssetForm() {
 
   if (loading) return (
     <div className="max-w-4xl mx-auto p-32 text-center group">
-      <div className="glow-mesh" />
       <div className="w-20 h-20 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mx-auto mb-8"></div>
       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Synchronizing Application State...</p>
     </div>
@@ -91,8 +94,8 @@ function EditAssetForm() {
       </Link>
 
       <div className="space-y-4">
-        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
-          Modify <span className="text-indigo-500">Infrastructure</span>
+        <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+          Modify <span className="text-indigo-600">Infrastructure</span>
         </h1>
         <p className="text-slate-400 text-lg font-medium max-w-lg">
           Update identifiers and metadata for your household assets.
@@ -100,28 +103,26 @@ function EditAssetForm() {
       </div>
 
       {error && (
-        <div className="p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex items-start gap-5 text-rose-400 animate-in slide-in-from-top-4 duration-500">
+        <div className="p-6 bg-rose-50 border border-rose-100 rounded-3xl flex items-start gap-5 text-rose-600 animate-in slide-in-from-top-4 duration-500">
           <AlertCircle className="w-6 h-6 flex-shrink-0" />
           <p className="font-bold text-sm">{error}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="glass-card rounded-[3.5rem] overflow-hidden p-10 md:p-16 space-y-12 relative">
-        <div className="glow-mesh" />
-        
+      <form onSubmit={handleSubmit} className="zen-card overflow-hidden p-10 md:p-16 space-y-12 relative">
         <div className="space-y-12 relative z-10">
           <div className="flex items-center gap-8 mb-4">
             <div className="w-20 h-20 rounded-[2rem] bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/30">
               {formData.assetType === 'car' ? <Car className="w-10 h-10 text-white" /> : formData.assetType === 'house' ? <Home className="w-10 h-10 text-white" /> : <Zap className="w-10 h-10 text-white" />}
             </div>
             <div>
-              <h2 className="text-3xl font-black text-white tracking-tight uppercase leading-tight">Unit <span className="text-indigo-500">Re-Configuration</span></h2>
-              <p className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mt-2">Class: {formData.assetType}</p>
+              <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase leading-tight">Unit <span className="text-indigo-600">Re-Configuration</span></h2>
+              <p className="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mt-2">Class: {formData.assetType}</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-6 flex items-center gap-2">
               <Cpu className="w-3 h-3" />
               Operational Callsign
             </label>
@@ -131,12 +132,26 @@ function EditAssetForm() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g. Unit-01 Primis"
-              className="input-premium py-6 px-8 text-xl"
+              className="input-zen py-6 px-8 text-xl"
             />
           </div>
 
           <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-6 flex items-center gap-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-6 flex items-center gap-2">
+              <MapPin className="w-3 h-3" />
+              System Location (City/Site)
+            </label>
+            <input
+              type="text"
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              placeholder="e.g. New York, Garage, or Site-B"
+              className="input-zen py-6 px-8 text-xl"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-6 flex items-center gap-2">
               <Database className="w-3 h-3" />
               Asset Metadata
             </label>
@@ -145,7 +160,7 @@ function EditAssetForm() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Identify VIN, Serial indices, or geo-spatial data..."
               rows={4}
-              className="input-premium py-6 px-8"
+              className="input-zen py-6 px-8"
             />
           </div>
 
@@ -153,7 +168,7 @@ function EditAssetForm() {
             <button
               type="submit"
               disabled={saving}
-              className="btn-premium btn-premium-primary flex-1 h-[72px] text-lg shadow-2xl group/submit"
+              className="btn-zen-primary flex-1 h-[72px] text-lg shadow-2xl group/submit"
             >
               {saving ? (
                 <>
@@ -170,9 +185,9 @@ function EditAssetForm() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="btn-premium btn-premium-secondary h-[72px] px-10 border-white/5"
+              className="btn-zen-secondary h-[72px] px-10 border-slate-100"
             >
-              <X className="w-5 h-5 text-slate-500" />
+              <X className="w-5 h-5 text-slate-400" />
               Cancel
             </button>
           </div>
