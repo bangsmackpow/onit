@@ -87,9 +87,10 @@ export default function AdminPage() {
     try {
       await apiPost('/api/admin/seed-knowledge', {})
       alert('Knowledge base synchronized successfully.')
-    } catch (err) {
+    } catch (err: any) {
       console.error('Seed failed', err)
-      alert('Failed to seed archives.')
+      const details = err.response?.data?.details || err.response?.data?.error || 'Unknown error'
+      alert(`Failed to seed archives: ${details}`)
     }
   }
 

@@ -100,7 +100,12 @@ export default function NewAssetPage() {
       router.push('/assets')
     } catch (err: any) {
       console.error('Failed to create asset', err)
-      setError(err.response?.data?.error || 'Failed to create asset. Please try again.')
+      const details = err.response?.data?.details
+      const detailStr = Array.isArray(details) 
+        ? details.map((d: any) => `${d.path.join('.')}: ${d.message}`).join(', ')
+        : String(details || '')
+      
+      setError(`${err.response?.data?.error || 'Failed to create asset'}${detailStr ? ` (${detailStr})` : ''}`)
     } finally {
       setLoading(false)
     }

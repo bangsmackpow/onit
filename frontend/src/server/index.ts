@@ -51,11 +51,17 @@ app.route('/api/auth', authRoutes)
 // ============================================================================
 
 // Apply auth middleware to all /api/* routes except /auth and /health
+app.use('/api/assets', authMiddleware)
 app.use('/api/assets/*', authMiddleware)
+app.use('/api/tasks', authMiddleware)
 app.use('/api/tasks/*', authMiddleware)
+app.use('/api/history', authMiddleware)
 app.use('/api/history/*', authMiddleware)
+app.use('/api/reminders', authMiddleware)
 app.use('/api/reminders/*', authMiddleware)
+app.use('/api/invitations', authMiddleware)
 app.use('/api/invitations/*', authMiddleware)
+app.use('/api/media', authMiddleware)
 app.use('/api/media/*', authMiddleware)
 app.use('/api/billing/create-checkout-session', authMiddleware)
 
@@ -63,7 +69,7 @@ app.use('/api/billing/create-checkout-session', authMiddleware)
 const adminMiddleware = async (c: any, next: any) => {
   await authMiddleware(c, async () => {}) // Ensure authenticated first
   const userEmail = c.get('email')
-  const allowedEmail = c.env.ADMIN_EMAIL || 'curtis@example.com' // Fallback for dev if not set
+  const allowedEmail = c.env.ADMIN_EMAIL || 'curtis@example.com' 
   
   if (userEmail !== allowedEmail) {
     return c.json({ error: 'Forbidden: Admin access only' }, 403)
@@ -71,6 +77,7 @@ const adminMiddleware = async (c: any, next: any) => {
   await next()
 }
 
+app.use('/api/admin', adminMiddleware)
 app.use('/api/admin/*', adminMiddleware)
 
 app.route('/api/assets', assetsRoutes)

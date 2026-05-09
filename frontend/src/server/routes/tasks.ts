@@ -211,11 +211,12 @@ tasks.post('/', async (c) => {
 
     return c.json({ task: newTask }, 201)
   } catch (error) {
-    console.error('Error creating task:', error)
+    const rawBody = await c.req.parseBody().catch(() => ({}))
+    console.error('Error creating task:', error, 'Body:', rawBody)
     if (error instanceof z.ZodError) {
       return c.json({ error: 'Validation error', details: error.errors }, 400)
     }
-    return c.json({ error: 'Failed to create task' }, 500)
+    return c.json({ error: 'Failed to create task', details: String(error) }, 500)
   }
 })
 
