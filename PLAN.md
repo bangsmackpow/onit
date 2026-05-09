@@ -16,13 +16,20 @@ ONIT is a serverless, multi-tenant maintenance and chore scheduling application 
 - **Master Templates:** Over 50+ professional maintenance protocols (Cars, HVAC, Lawn, Appliances).
 - **Daily Digest:** Automated email summaries via SMTP2GO and Cloudflare Crons.
 - **Snooze Engine:** Logic to postpone tasks by 3, 7, or 14 days.
+- **Supportive Archives:** Backend article system with step-by-step guides (HVAC sizing, smoke tests).
 
-### 3. "Fully Usable" UX Features
-- **Global Search (CMD+K):** Universal command bar for assets and tasks.
-- **Full CRUD (Edit Mode):** Capability to modify assets and recurring task schedules.
+### 3. "Zen Garden" UX Refactor
+- **Aesthetic Pivot:** Simplified minimalist white/slate theme. High-contrast UI for readability.
+- **Rule of Three:** Dashboard redesigned to focus on exactly 3 daily priorities.
+- **Global Search (CMD+K):** Universal command bar for assets, tasks, and knowledge articles.
+- **Full CRUD:** Capability to modify assets and recurring task schedules.
 - **Household Management:** Email-based invitations and role-based access control (Admin/Member).
 - **Web Push Notifications:** Native lock-screen alerts for overdue tasks.
-- **Stripe Integration:** Production-ready billing flow for Premium upgrades.
+
+### 4. Stability & Production Readiness
+- **Static Export Support:** Refactored dynamic routes for compatibility with `output: export` on Cloudflare Pages.
+- **Migration & Seeding:** Stabilized D1 schema updates and added a one-click "Seed Archives" button for Admin.
+- **Middleware Hardening:** Fixed security gaps to ensure all API routes are properly protected.
 
 ---
 
@@ -45,4 +52,4 @@ ONIT is a serverless, multi-tenant maintenance and chore scheduling application 
 
 ---
 
-*Last Updated: May 6, 2026*
+*Last Updated: May 8, 2026*
